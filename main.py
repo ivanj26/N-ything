@@ -5,39 +5,26 @@ from pieces import *
     @params     file_name     (string)
     @returns    list of piece (list)
 """
-def open_file(file_name):
+def file_handler(file_name):
     '''
-        !!! Ganti jadi dictionary !!!
-        Declare list of bidak
-            list = [a,b,c,d]
-
-            Value a untuk BISHOP
-            Value b untuk KNIGHT
-            Value c untuk QUEEN
-            Value d untuk ROCK
+        outputnya dictionary, contoh:
+        {'WHITE KNIGHT': 2, 'WHITE ROOK': 2, 'WHITE QUEEN': 2, 'WHITE BISHOP': 2}
     '''
-    list = [0,0,0,0]
+    with open(file_name) as fin:
+        file = []
+        for line in fin.readlines():
+            file.append(line.replace('\n', ''))
+    
+    file_encoded = [x.split() for x in file]
+    
+    result_dict = {}
+    for line in file_encoded:
+        result_dict[line[0] + ' ' + line[1]] = int(line[2])
+    
+    return result_dict
 
-    with open(file_name, "r") as file:
-        lines = file.readlines()
-
-    for line in lines:
-        # Input (asumsi input tanpa warna): KNIGHT 2 -> words = ["KNIGHT", 2]
-        # Split it!
-        words = line.split()
-
-        if words[0].lower() == "bishop":
-            list[0] += int(words[1])
-        elif words[0].lower() == "knight":
-            list[1] += int(words[1])
-        elif words[0].lower() == "queen":
-            list[2] += int(words[1])
-        else:
-            list[3] += int(words[1])
-
-    return list
 
 ### Main
 ### Baca file dengan method raw_input
 file_name = raw_input("Enter the file name: ");
-print open_file(file_name)
+print file_handler(file_name)
