@@ -1,91 +1,55 @@
 from pieces import *
+from random import randint
 
 class Board:
 	def __init__(self, request):
-		"""Method contructor.
-
-	    Parameters
-	    ----------
-	    request : dictionary
-	        Dictionary of the total ChessPiece to be instantiate.
-
-	    Returns
-	    -------
-		    returns nothing
-
-	    """
-
 		self.__MAX_ROW = 8
 		self.__MAX_COLUMN = 8
 		self.__list_of_pieces = []
+		# Create new ChessPiece instance based on request.
 		for (key, value) in (request.items()):
-			print(key, value)
+			color = key.split()[0]
+			piece_type = key.split()[1]
+			for i in range (value):
+				position = self.random_move()
+				if (piece_type == 'BISHOP'):
+					obj = Bishop(color, position['x'], position['y'])
+				elif (piece_type == 'KNIGHT'):
+					obj = Knight(color, position['x'], position['y'])
+				elif (piece_type == 'QUEEN'):
+					obj = Queen(color, position['x'], position['y'])
+				elif (piece_type == 'ROOK'):
+					obj = Rook(color, position['x'], position['y'])
+				self.__list_of_pieces.append(obj)
+		print(self.__list_of_pieces)
 
-	def is_out_of_bound(self, chessPiece):
-		"""Method to check whether the chessPiece position is out of board index.
+	def is_out_of_bound(self, x, y):
+		return ((x < 0 or x > self.__MAX_ROW) or (y < 0 or y > self.__MAX_COLUMN))
 
-		Parameters
-		----------
-		chessPiece : object
-		    Instance of ChessPiece.
+	def is_overlap(self, x, y):
+		# TODO
+		return False
 
-		Returns
-		-------
-		boolean
-		    True if the position is out of bound, otherwise false.
-
-		"""
-
-		return ((chessPiece.get_x()<0 or chessPiece.get_x()>self.__MAX_ROW) or
-		(chessPiece.get_y()<0 or chessPiece.get_y()>self.__MAX_COLUMN))
-
-	def is_move_valid(self, position):
-		"""Short summary.
-
-		Parameters
-		----------
-		position : type
-		    Description of parameter `position`.
-
-		Returns
-		-------
-		type
-		    Description of returned object.
-
-		"""
-		return
+	def is_move_valid(self, x, y):
+		return (not(self.is_out_of_bound(x, y)) and not(self.is_overlap(x, y)))
 
 	def random_pick(self):
-		"""Short summary.
-
-		Returns
-		-------
-		type
-		    Description of returned object.
-
-		"""
 		random_number = random()
 		randomize_index_number = round(random_number * (len(self.__list_of_pieces)-1))
+
 		return (self.__list_of_pieces[randomize_index_number])
 
 	def random_move(self):
-		"""Short summary.
+		valid = False
+		while not valid:
+			x = randint(0, 8)
+			y = randint(0, 8)
+			valid = self.is_move_valid(x, y)
 
-		Returns
-		-------
-		type
-		    Description of returned object.
-
-		"""
-		return
+		return {
+			'x': x,
+			'y': y,
+		}
 
 	def calculate_heuristic(self):
-		"""Short summary.
-
-		Returns
-		-------
-		type
-		    Description of returned object.
-
-		"""
 		return
