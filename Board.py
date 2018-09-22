@@ -37,8 +37,8 @@ class Board:
 
 	def is_overlap(self, x, y):
 		overlap_state = False
-		for chess_piece in self.get_pieces() :
-			if (chess_piece.get_x() == x) and (chess_piece.get_y() == y):
+		for piece in self.get_pieces() :
+			if (piece.get_x() == x) and (piece.get_y() == y):
 				overlap_state = True
 				break
 		return overlap_state
@@ -55,8 +55,8 @@ class Board:
 	def random_move(self):
 		valid = False
 		while not valid:
-			x = randint(0, 8)
-			y = randint(0, 8)
+			x = randint(0, 7)
+			y = randint(0, 7)
 			valid = self.is_move_valid(x, y)
 
 		return {
@@ -87,16 +87,21 @@ class Board:
 	def draw(self):
 		for y in range(self.get_max_rows()):
 			for x in range(self.get_max_columns()):
-				if (self.is_overlap(x,y)):
+				found = False
+				for piece in (self.get_pieces()):
+					if (piece.get_x() == x and piece.get_y() == y):
+						found = True
+						break
+				if found:
 					print(' ' + piece.__class__.__name__[0] + ' ', end='')
 				else:
 					print(' - ', end='')
-				# for piece in (self.get_pieces()):
-				# 	if (piece.get_x() == x and piece.get_y() == y):
-				# 		print(' ' + piece.__class__.__name__[0] + ' ', end='')
-				# 	else:
-				# 		print(' - ', end='')
 			print()
-		return None
+		return ''
+
+	def print_all_pieces(self):
+		for piece in (self.get_pieces()):
+			print (piece.__class__.__name__[0] + ' (', piece.get_x(), ', ', piece.get_y(), ')')
+		return ''
 
 		
