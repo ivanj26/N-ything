@@ -32,5 +32,11 @@ def file_handler(file_name):
 
 ### Main
 ### Baca file dengan method raw_input
-file_name = raw_input("Enter the file name: ");
+# file_name = raw_input("Enter the file name: ")
+file_name = 'input.txt'
 print file_handler(file_name)
+
+### Board test cases
+request = file_handler(file_name)
+board = Board(request)
+print(board.calculate_heuristic())
