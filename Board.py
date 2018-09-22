@@ -97,11 +97,9 @@ class Board:
 				else:
 					print(' - ', end='')
 			print()
-		return ''
 
 	def print_all_pieces(self):
 		for piece in (self.get_pieces()):
 			print (piece.__class__.__name__[0] + ' (', piece.get_x(), ', ', piece.get_y(), ')')
-		return ''
 
 		
