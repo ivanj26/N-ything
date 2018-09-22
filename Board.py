@@ -27,7 +27,7 @@ class Board:
 		return ((x < 0 or x > self.__MAX_ROW) or (y < 0 or y > self.__MAX_COLUMN))
 
 	def is_overlap(self, x, y):
-		# TODO
+		
 		return False
 
 	def is_move_valid(self, x, y):
