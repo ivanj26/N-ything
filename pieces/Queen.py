@@ -19,8 +19,8 @@ class Queen(ChessPiece):
 
         """
 
-        ChessPiece.__init__(self, color, x, y)
-        self.__name = "Queen"
+        super(Queen, self).__init__(color, x, y)
+        self.__name = "Q"
         self.__rules = [lambda i : {'x' : self.get_x() + i, 'y' : self.get_y()}, lambda i : {'x' : self.get_x() - i, 'y' : self.get_y()},
                       lambda i : {'x' : self.get_x(), 'y' : self.get_y() + i}, lambda i : {'x' : self.get_x(), 'y' : self.get_y() - i},
                       lambda i : {'x' : self.get_x() + i, 'y' : self.get_y() + i}, lambda i : {'x' : self.get_x() + i, 'y' : self.get_y() - i},
@@ -37,7 +37,7 @@ class Queen(ChessPiece):
         """
         return self.__rules
 
-    def get_name():
+    def __str__(self):
         """Gets name of class.
 
         Returns
@@ -47,10 +47,3 @@ class Queen(ChessPiece):
 
         """
         return self.__name
-
-
-#Queen x,y = 5,6
-# q = Queen("white", 5, 6)
-
-# Cara menggunakan lambda exp -> x(i)
-# print str(q.get_rules()[7](1));

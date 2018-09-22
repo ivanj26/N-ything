@@ -19,8 +19,8 @@ class Knight(ChessPiece):
 
         """
 
-        ChessPiece.__init__(self, color, x, y)
-        self.__name = "Knight"
+        super(Knight, self).__init__(color, x, y)
+        self.__name = "K"
         self.__rules = [lambda : {'x' : self.get_x() - 2, 'y' : self.get_y() + 1}, lambda : {'x' : self.get_x() - 1, 'y' : self.get_y() + 2},
                       lambda : {'x' : self.get_x() + 1, 'y' : self.get_y() + 2}, lambda : {'x' : self.get_x() + 2, 'y' : self.get_y() + 1},
                       lambda : {'x' : self.get_x() + 2, 'y' : self.get_y() - 1}, lambda : {'x' : self.get_x() + 1, 'y' : self.get_y() - 2},
@@ -37,7 +37,7 @@ class Knight(ChessPiece):
         """
         return self.__rules
 
-    def get_name():
+    def __str__(self):
         """Gets name of class.
 
         Returns
@@ -47,6 +47,3 @@ class Knight(ChessPiece):
 
         """
         return self.__name
-
-# k = Knight("white", 5 ,6)
-# print str(k.get_rules()[0]());

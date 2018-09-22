@@ -38,7 +38,9 @@ print file_handler(file_name)
 
 ### Board test cases
 request = file_handler(file_name)
+
+### Create instance of Board
 board = Board(request)
-print 'Heuristic: ', board.calculate_heuristic()
-print board.draw()
-print board.print_all_pieces()
+print 'Heuristic: ', board.calculate_heuristic(), '\n'
+board.draw()
+board.print_all_pieces()

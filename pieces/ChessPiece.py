@@ -1,4 +1,4 @@
-class ChessPiece:
+class ChessPiece(object):
     def __init__(self, color, x, y):
         """This method initiliaze chess piece attributes (color and position).
 
