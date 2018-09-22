@@ -35,8 +35,12 @@ class Board:
 		return ((x < 0 or x > self.get_max_rows()) or (y < 0 or y > self.get_max_columns()))
 
 	def is_overlap(self, x, y):
-		
-		return False
+		overlap_state = False
+		for chess_piece in self.get_pieces() :
+			if (chess_piece.get_x() == x) and (chess_piece.get_y() == y):
+				overlap_state = True
+				break
+		return overlap_state
 
 	def is_move_valid(self, x, y):
 		return (not(self.is_out_of_bound(x, y)) and not(self.is_overlap(x, y)))
