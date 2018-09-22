@@ -3,8 +3,8 @@ from random import randint
 
 class Board:
 	def __init__(self, request):
-		self.__MAX_ROW = 8
-		self.__MAX_COLUMN = 8
+		self.__MAX_ROWS = 8
+		self.__MAX_COLUMNS = 8
 		self.__list_of_pieces = []
 		# Create new ChessPiece instance based on request.
 		for (key, value) in (request.items()):
@@ -20,11 +20,19 @@ class Board:
 					obj = Queen(color, position['x'], position['y'])
 				elif (piece_type == 'ROOK'):
 					obj = Rook(color, position['x'], position['y'])
-				self.__list_of_pieces.append(obj)
-		print(self.__list_of_pieces)
+				self.get_pieces().append(obj)
+	
+	def get_pieces(self):
+		return self.__list_of_pieces
+
+	def get_max_columns(self):
+		return self.__MAX_COLUMNS
+	
+	def get_max_rows(self):
+		return self.__MAX_ROWS
 
 	def is_out_of_bound(self, x, y):
-		return ((x < 0 or x > self.__MAX_ROW) or (y < 0 or y > self.__MAX_COLUMN))
+		return ((x < 0 or x > self.get_max_rows()) or (y < 0 or y > self.get_max_columns()))
 
 	def is_overlap(self, x, y):
 		# TODO
@@ -35,9 +43,9 @@ class Board:
 
 	def random_pick(self):
 		random_number = random()
-		randomize_index_number = round(random_number * (len(self.__list_of_pieces)-1))
+		randomize_index_number = round(random_number * (len(self.get_pieces)-1))
 
-		return (self.__list_of_pieces[randomize_index_number])
+		return (self.get_pieces[randomize_index_number])
 
 	def random_move(self):
 		valid = False
@@ -52,4 +60,26 @@ class Board:
 		}
 
 	def calculate_heuristic(self):
+		value = 0
+		for piece in (self.get_pieces()):
+			for rule in (piece.get_rules()):
+				if isinstance(piece, Knight):
+					current_move = rule()
+					if (self.is_overlap(current_move['x'], current_move['y'])):
+						value += 1
+				else:
+					i = 1
+					valid = True
+					while valid:
+						current_move = rule(i)
+						if (self.is_overlap(current_move['x'], current_move['y'])):
+							value += 1
+						i += 1
+						valid = self.is_move_valid(current_move['x'], current_move['y'])
+
+		return value
+
+	def draw(self):
 		return
+
+		
