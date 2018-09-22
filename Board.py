@@ -1,3 +1,4 @@
+from __future__ import print_function
 from pieces import *
 from random import randint
 
@@ -80,6 +81,18 @@ class Board:
 		return value
 
 	def draw(self):
-		return
+		for y in range(self.get_max_rows()):
+			for x in range(self.get_max_columns()):
+				if (self.is_overlap(x,y)):
+					print(' ' + piece.__class__.__name__[0] + ' ', end='')
+				else:
+					print(' - ', end='')
+				# for piece in (self.get_pieces()):
+				# 	if (piece.get_x() == x and piece.get_y() == y):
+				# 		print(' ' + piece.__class__.__name__[0] + ' ', end='')
+				# 	else:
+				# 		print(' - ', end='')
+			print()
+		return None
 
 		
