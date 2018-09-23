@@ -1,5 +1,6 @@
 from __future__ import print_function
 from time import sleep
+from time import time
 import os
 import sys
 import math
@@ -38,14 +39,18 @@ class SimulatedAnnealing:
         #Calculate current heuristic
         current_heuristic = self.__board.calculate_heuristic()
 
+        #Start
+        start = round(time(), 3)
+
         while (attempts < self.__MAX_ATTEMPTS):
             #Initialize temperature
             temp = self.__TEMP
+            print("Attempts\t= " + str(attempts))
 
             #when temp < 1 -> prob nearly to zero
             while (temp > 1 and current_heuristic != 0):
-                #print board
-                self.print_immediately(attempts, current_heuristic, temp);
+                # For the fastest performance, do not update Board UI
+                # self.print_immediately(attempts, current_heuristic, temp);
 
                 #Call random_pick from board
                 piece = self.__board.random_pick()
@@ -79,6 +84,10 @@ class SimulatedAnnealing:
                     temp = self.cooling_down(temp)
 
             if (current_heuristic == 0):
+                finish = round(time(), 3)
+                print("Heuristic\t= " + str(self.__board.calculate_heuristic()))
+                print("Time\t\t= " + str(finish-start) + " seconds\n")
+
                 self.__board.draw()
                 return
 
@@ -90,6 +99,8 @@ class SimulatedAnnealing:
 
             #Increment the attempts
             attempts+=1
+            sleep(0.03)
+            os.system('clear')
 
         return "You've exceeded the maximum attempts!"
 
