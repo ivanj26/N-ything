@@ -1,6 +1,7 @@
 from __future__ import print_function
 from pieces import *
 from random import randint
+from random import random
 import string
 
 class Board:
@@ -51,9 +52,8 @@ class Board:
 
 	def random_pick(self):
 		random_number = random()
-		randomize_index_number = round(random_number * (len(self.get_pieces)-1))
-
-		return (self.get_pieces[randomize_index_number])
+		randomize_index_number = round(random_number * (len(self.get_pieces())-1))
+		return (self.get_pieces()[int(randomize_index_number)])
 
 	def random_move(self):
 		valid = False
