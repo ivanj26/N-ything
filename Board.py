@@ -147,7 +147,6 @@ class Board:
 
 		random_number = random()
 		randomize_index_number = round(random_number * (len(self.get_pieces())-1))
-
 		return (self.get_pieces()[int(randomize_index_number)])
 
 	def random_move(self):

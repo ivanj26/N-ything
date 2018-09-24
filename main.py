@@ -1,4 +1,5 @@
 from pieces import *
+from algorithm import *
 from Board import Board
 
 def file_handler(file_name):
@@ -41,6 +42,9 @@ request = file_handler(file_name)
 
 ### Create instance of Board
 board = Board(request)
-print 'Heuristic: ', board.calculate_heuristic(), '\n'
-board.draw()
-board.print_all_pieces()
+# print 'Heuristic: ', board.calculate_heuristic(), '\n'
+# board.draw()
+
+## Using SimulatedAnnealing
+simulated_annealing = SimulatedAnnealing(board)
+simulated_annealing.start(request)
