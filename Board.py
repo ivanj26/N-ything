@@ -1,6 +1,6 @@
 from __future__ import print_function
 from pieces import Bishop, Knight, Queen, Rook
-from random import choice, random, randint, shuffle
+from random import choice, random, randint, sample, shuffle
 
 class Board:
 	def __init__(self, request):
@@ -177,42 +177,46 @@ class Board:
 
 		return False
 
-	def random_pick(self, shuffle = False):
-		"""It picks random object from the list or shuffle list of object.
+	def random_pick(self, option = False):
+		"""It picks random object from the list or option list of object.
 		
 		Parameters
 		----------
-		shuffle : bool, optional
-			Flag for shuffle (the default is False, which is not shuffle the list)
+		option : bool, optional
+			Flag for option (the default is False, which is not option the list)
 		
 		Returns
 		-------
 		object or list
-			If shuffle is False, then it returns a random object from the list.
-			Otherwise, it returns a shuffle list of objects.
+			If option is False, then it returns a random object from the list.
+			Otherwise, it returns a option list of objects.
 		"""
 
-		if (not shuffle):
+		if (not option):
 			random_number = random()
 			randomize_index_number = round(random_number * (len(self.get_pieces())-1))
 
 			return (self.get_pieces()[int(randomize_index_number)])
-		# If shuffle is True.
-		return shuffle(self.get_pieces())
+
+		# If option is True.
+		return sample(self.get_pieces(), len(self.get_pieces()))
 
 
-	def random_move(self, shuffle = False):
-		"""It gives a position x, y that is valid to move based on is_move_valid.
+	def random_move(self, option = False):
+		"""It gives a random position or a list of a valid position to move.
+		
+		Parameters
+		----------
+		option : bool, optional
+			Flag (the default is False, which means just give a position)
 		
 		Returns
 		-------
-		dictionary
-			example of return:
-			{
-				'x': 1,
-				'y': 2,
-			}
+		dictionary or list
+			Returns a dictionary of {x, y} when option is False.
+			Otherwise, returns list of dictionary of {x, y}.
 		"""
+
 
 		# Converts object position to grid system.
 		piece_location = []
@@ -220,14 +224,17 @@ class Board:
 			piece_location.append(self.convert_to_grid(piece.get_x(), piece.get_y()))
 		# Get maximum grid.
 		max_grid = self.convert_to_grid(self.get_max_columns()-1, self.get_max_rows()-1)
-		if (not shuffle):
+		if (not option):
 			# Choose random grid value except piece locations.
 			random_grid = choice([i for i in range(0, max_grid) if i not in piece_location])
 
 			return self.convert_to_axis(random_grid)
-		# Shuffle the possible moves, when the shuffle is True.
-		possible_grid = shuffle([i for i in range(0, max_grid) if i not in piece_location])
+		# Get all possible grid.
+		possible_grid = [i for i in range(0, max_grid) if i not in piece_location]
+		# Shuffle the possible moves.
+		shuffle(possible_grid)
 		possible_moves = []
+		# Get all possible moves.
 		for val in possible_grid:
 			possible_moves.append(self.convert_to_axis(val))
 		
@@ -299,4 +306,3 @@ class Board:
 
 		for piece in (self.get_pieces()):
 			print (str(piece) + ' (', piece.get_x(), ', ', piece.get_y(), ')')
-			print (str(piece) + ' (', self.convert_to_grid(piece.get_x(), piece.get_y()) , ')')
