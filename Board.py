@@ -1,11 +1,10 @@
 from __future__ import print_function
-from pieces import *
-from random import randint, random
-import string
+from pieces import Bishop, Knight, Queen, Rook
+from random import choice, random, randint, shuffle
 
 class Board:
 	def __init__(self, request):
-		"""This function initiates board conditions based on request file given.
+		"""It instantiates board conditions based on request file given.
 		
 		Parameters
 		----------
@@ -29,7 +28,6 @@ class Board:
 			piece_type = key.split()[1]
 			for i in range (value):
 				position = self.random_move()
-
 				obj = None
 				if (piece_type == 'BISHOP'):
 					obj = Bishop(color, position['x'], position['y'])
@@ -39,11 +37,16 @@ class Board:
 					obj = Queen(color, position['x'], position['y'])
 				elif (piece_type == 'ROOK'):
 					obj = Rook(color, position['x'], position['y'])
-
+				# Push new instance to a list.
 				self.get_pieces().append(obj)
 
 	def get_pieces(self):
 		"""It gets list of pieces on the board.
+		
+		Parameters
+		----------
+		idx : int, optional
+			index number (the default is None, which returns all list of pieces)
 		
 		Returns
 		-------
@@ -74,6 +77,43 @@ class Board:
 		"""
 
 		return self.__MAX_ROWS
+
+	def convert_to_grid(self, x, y):
+		"""It converts x,y-axis to grid systems.
+		
+		Parameters
+		----------
+		x : int
+			x-axis
+		y : int
+			y-axis
+		
+		Returns
+		-------
+		int
+			grid value
+		"""
+
+		return (y*8 + x)
+
+	def convert_to_axis(self, val):
+		"""It converts grid system to x,y-axis.
+		
+		Parameters
+		----------
+		val : int
+			grid value
+		
+		Returns
+		-------
+		dictionary
+			x,y-axis value
+		"""
+
+		return {
+			'y': val / 8,
+			'x': val % 8,
+		}
 
 	def is_move_valid(self, x, y):
 		"""It validates whether the location x,y in the params is valid on the board.
@@ -134,22 +174,34 @@ class Board:
 		for piece in self.get_pieces() :
 			if (piece.get_x() == x) and (piece.get_y() == y):
 				return True
+
 		return False
 
-	def random_pick(self):
-		"""It picks random piece on the current list of pieces on the board.
+	def random_pick(self, shuffle = False):
+		"""It picks random object from the list or shuffle list of object.
+		
+		Parameters
+		----------
+		shuffle : bool, optional
+			Flag for shuffle (the default is False, which is not shuffle the list)
 		
 		Returns
 		-------
-		ChessPiece object
-			One of ChessPiece object in the current list of pieces.
+		object or list
+			If shuffle is False, then it returns a random object from the list.
+			Otherwise, it returns a shuffle list of objects.
 		"""
 
-		random_number = random()
-		randomize_index_number = round(random_number * (len(self.get_pieces())-1))
-		return (self.get_pieces()[int(randomize_index_number)])
+		if (not shuffle):
+			random_number = random()
+			randomize_index_number = round(random_number * (len(self.get_pieces())-1))
 
-	def random_move(self):
+			return (self.get_pieces()[int(randomize_index_number)])
+		# If shuffle is True.
+		return shuffle(self.get_pieces())
+
+
+	def random_move(self, shuffle = False):
 		"""It gives a position x, y that is valid to move based on is_move_valid.
 		
 		Returns
@@ -162,16 +214,24 @@ class Board:
 			}
 		"""
 
-		valid = False
-		while not valid:
-			x = randint(0, 7)
-			y = randint(0, 7)
-			valid = self.is_move_valid(x, y)
+		# Converts object position to grid system.
+		piece_location = []
+		for piece in (self.get_pieces()):
+			piece_location.append(self.convert_to_grid(piece.get_x(), piece.get_y()))
+		# Get maximum grid.
+		max_grid = self.convert_to_grid(self.get_max_columns()-1, self.get_max_rows()-1)
+		if (not shuffle):
+			# Choose random grid value except piece locations.
+			random_grid = choice([i for i in range(0, max_grid) if i not in piece_location])
 
-		return {
-			'x': x,
-			'y': y,
-		}
+			return self.convert_to_axis(random_grid)
+		# Shuffle the possible moves, when the shuffle is True.
+		possible_grid = shuffle([i for i in range(0, max_grid) if i not in piece_location])
+		possible_moves = []
+		for val in possible_grid:
+			possible_moves.append(self.convert_to_axis(val))
+		
+		return possible_moves
 
 	def calculate_heuristic(self):
 		"""It calculates the heuristic value of current pieces locations.
@@ -212,7 +272,7 @@ class Board:
 		
 		"""
 
-		for y in range(self.get_max_rows()):
+		for y in range(self.get_max_rows()-1, -1, -1):
 			print(str(y) + ' ', end='')
 			for x in range(self.get_max_columns()):
 				found = False
@@ -239,3 +299,4 @@ class Board:
 
 		for piece in (self.get_pieces()):
 			print (str(piece) + ' (', piece.get_x(), ', ', piece.get_y(), ')')
+			print (str(piece) + ' (', self.convert_to_grid(piece.get_x(), piece.get_y()) , ')')
