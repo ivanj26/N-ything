@@ -1,6 +1,4 @@
-from pieces import *
 from algorithm import *
-from Board import Board
 
 def file_handler(file_name):
     """Create dictionary of chess pieces.
@@ -40,11 +38,6 @@ print file_handler(file_name)
 ### Board test cases
 request = file_handler(file_name)
 
-### Create instance of Board
-board = Board(request)
-# print 'Heuristic: ', board.calculate_heuristic(), '\n'
-# board.draw()
-
 ## Using SimulatedAnnealing
-simulated_annealing = SimulatedAnnealing(board)
-simulated_annealing.start(request)
+simulated_annealing = SimulatedAnnealing(request)
+simulated_annealing.start()
