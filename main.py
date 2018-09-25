@@ -35,6 +35,11 @@ def file_handler(file_name):
 file_name = 'input.txt'
 request = file_handler(file_name)
 
+### BOARD ###
+# board = Board(request)
+# print("Heuristic:", board.calculate_heuristic())
+# board.draw()
+
 ### HILL CLIMBING ###
 # First Choice Hill Climbing
 # HillClimbing(request, 1, 10)

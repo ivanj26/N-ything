@@ -1,6 +1,6 @@
 from __future__ import print_function
 from pieces import Bishop, Knight, Queen, Rook
-from random import choice, random, randint, sample, shuffle
+from random import choice, random, sample, shuffle
 
 class Board:
 	def __init__(self, request):
@@ -18,17 +18,24 @@ class Board:
 		
 		"""
 
+		self.__COLORS = []
 		self.__MAX_ROWS = 8
 		self.__MAX_COLUMNS = 8
 		self.__list_of_pieces = []
 
 		# Create new ChessPiece instance based on request.
 		for (key, value) in (request.items()):
+			# Get color property.
 			color = key.split()[0]
+			# Get piece type.
 			piece_type = key.split()[1]
+			# Iterate until total request number of each chess piece type has been created.
 			for i in range (value):
-				position = self.random_move()
+				# Append if new color variant exist.
+				if color not in (self.get_colors()):
+					self.get_colors().append(color)
 				obj = None
+				position = self.random_move()
 				if (piece_type == 'BISHOP'):
 					obj = Bishop(color, position['x'], position['y'])
 				elif (piece_type == 'KNIGHT'):
@@ -37,27 +44,42 @@ class Board:
 					obj = Queen(color, position['x'], position['y'])
 				elif (piece_type == 'ROOK'):
 					obj = Rook(color, position['x'], position['y'])
-				# Push new instance to a list.
+				# Append new instance to a list.
 				self.get_pieces().append(obj)
 
-	def get_pieces(self):
-		"""It gets list of pieces on the board.
+	def get_colors(self):
+		"""It returns a list of chess pieces colors variant.
+		
+		Returns
+		-------
+		list
+			chess piece colors variant
+		"""
+
+		return self.__COLORS
+
+	def get_pieces(self, color = None):
+		"""It returns list of pieces on the board.
 		
 		Parameters
 		----------
-		idx : int, optional
-			index number (the default is None, which returns all list of pieces)
+		color : string, optional
+			chess piece color (the default is None, which returns all list of pieces)
 		
 		Returns
 		-------
 		list
 			list of pieces on the board.
 		"""
-
+		if (color == "WHITE"):
+			return [piece for piece in self.get_pieces() if piece.get_color() == "WHITE"]
+		elif (color == "BLACK"):
+			return [piece for piece in self.get_pieces() if piece.get_color() == "BLACK"]
+		
 		return self.__list_of_pieces
 
 	def get_max_columns(self):
-		"""It gets max columns on the board.
+		"""It returns max columns on the board.
 		
 		Returns
 		-------
@@ -68,7 +90,7 @@ class Board:
 		return self.__MAX_COLUMNS
 
 	def get_max_rows(self):
-		"""It gets max rows on the board.
+		"""It returns max rows on the board.
 		
 		Returns
 		-------
@@ -96,12 +118,12 @@ class Board:
 
 		return (y*8 + x)
 
-	def convert_to_axis(self, val):
+	def convert_to_axis(self, value):
 		"""It converts grid system to x,y-axis.
 		
 		Parameters
 		----------
-		val : int
+		value : int
 			grid value
 		
 		Returns
@@ -111,30 +133,9 @@ class Board:
 		"""
 
 		return {
-			'y': val / 8,
-			'x': val % 8,
+			'x': value % 8,
+			'y': value / 8,
 		}
-
-	def is_move_valid(self, x, y):
-		"""It validates whether the location x,y in the params is valid on the board.
-		
-		It checks whether the given position is NOT of out of bound and NOT overlapping
-		with other piece on the board.
-
-		Parameters
-		----------
-		x : int
-			position of x
-		y : int
-			position of y
-		
-		Returns
-		-------
-		bool
-			returns True if the x,y is valid, otherwise False.
-		"""
-
-		return (not(self.is_out_of_bound(x, y)) and not(self.is_overlap(x, y)))
 
 	def is_out_of_bound(self, x, y):
 		"""It validates x,y position whether the location is within the board boundaries.
@@ -154,8 +155,9 @@ class Board:
 
 		return ((x < 0 or x >= self.get_max_rows()) or (y < 0 or y >= self.get_max_columns()))
 
-	def is_overlap(self, x, y):
-		"""It validates whether given x, y position is one of the current piece's location.
+	def is_overlap(self, x, y, color):
+		"""It returns an integer that indicates the value of x, y position in one of the
+		current piece's location.
 		
 		Parameters
 		----------
@@ -163,19 +165,25 @@ class Board:
 			position of x
 		y : int
 			position of y
+		color : string
+			chess piece color
 		
 		Returns
 		-------
-		bool
-			returns True if x, y position is one of the current piece's location on the board,
-			otherwise False.
+		int
+			-1: x, y position is not in any of current list of piece's location.
+			 0: x, y position is in one of current list of piece's location, but color is different.
+			 1: x, y position is in one of current list of piece's location and color is match.
 		"""
 
-		for piece in self.get_pieces() :
+		for piece in (self.get_pieces()):
 			if (piece.get_x() == x) and (piece.get_y() == y):
-				return True
-
-		return False
+				if (piece.get_color() == color):
+					return 1
+				
+				return 0
+		
+		return -1
 
 	def random_pick(self, option = False):
 		"""It picks random object from the list or option list of object.
@@ -198,9 +206,7 @@ class Board:
 
 			return (self.get_pieces()[int(randomize_index_number)])
 
-		# If option is True.
 		return sample(self.get_pieces(), len(self.get_pieces()))
-
 
 	def random_move(self, option = False):
 		"""It gives a random position or a list of a valid position to move.
@@ -216,7 +222,6 @@ class Board:
 			Returns a dictionary of {x, y} when option is False.
 			Otherwise, returns list of dictionary of {x, y}.
 		"""
-
 
 		# Converts object position to grid system.
 		piece_location = []
@@ -240,39 +245,81 @@ class Board:
 		
 		return possible_moves
 
-	def calculate_heuristic(self):
-		"""It calculates the heuristic value of current pieces locations.
+	def count_attack(self, enemy = False):
+		"""It counts how many attack that might be involved within current board's state.
 
 		Foreach pieces on the current list of pieces:
-			It checks how many pieces that it can attack based on its rules.
+			It checks how many pieces that it can attack based on its rules and colors.
+		
 		Heuristic value is the sum of how many pieces that each of pieces can attack.
+		
+		Parameters
+		----------
+		enemy : bool, optional
+			Enemy means attacks between enemies (different color) 
+			(the default is False, which is attack within friends)
 		
 		Returns
 		-------
 		int
-			heuristic value
+			total of attack that might be involved.
 		"""
 
+		# Get colors variant.
+		colors = self.get_colors()[:]
+		# Set initiate value.
 		value = 0
-		for piece in (self.get_pieces()):
-			for rule in (piece.get_rules()):
-				if isinstance(piece, Knight):
-					current_move = rule()
-					if (not self.is_out_of_bound(current_move['x'], current_move['y'])):
-						if (self.is_overlap(current_move['x'], current_move['y'])):
-							value += 1
-							break
-				else:
-					i = 1
-					current_move = rule(i)
-					while (not self.is_out_of_bound(current_move['x'], current_move['y'])):
-						if (self.is_overlap(current_move['x'], current_move['y'])):
-							value += 1
-							break
-						i+=1
-						current_move = rule(i)
 
+		# Calculate attack within friends.
+		for color in colors:
+			if (enemy) :
+				colors.remove(color)
+				opponent_color = colors.pop()
+			else:
+				opponent_color = color
+			for piece in (self.get_pieces(color)):
+				for rule in (piece.get_rules()):
+					if isinstance(piece, Knight):
+						current_move = rule()
+						if (not self.is_out_of_bound(current_move['x'], current_move['y'])):
+							inc = self.is_overlap(current_move['x'], current_move['y'], opponent_color)
+							if (inc != -1):
+								value += inc
+								break
+					else:
+						i = 1
+						current_move = rule(i)
+						while (not self.is_out_of_bound(current_move['x'], current_move['y'])):
+							inc = self.is_overlap(current_move['x'], current_move['y'], opponent_color)
+							if (inc != -1):
+								value += inc
+								break
+							i += 1
+							current_move = rule(i)
 		return value
+
+	def calculate_heuristic(self):
+		"""It calculates the heuristic value of current board's state.
+		
+		Returns
+		-------
+		dictionary
+			a: total attacks within the same color.
+			b: total attacks across different color.
+			total: sum of b - a, it is used for total heuristic value.
+		"""
+
+		a = self.count_attack(False)
+		if (len(self.get_colors()) == 1):
+			b = 0
+		else:
+			b = self.count_attack(True)
+
+		return {
+			'a': a,
+			'b': b,
+			'total': b - a,
+		}
 
 	def draw(self):
 		"""It draws location of current board.
@@ -288,7 +335,10 @@ class Board:
 						found = True
 						break
 				if found:
-					print(' ' + piece.__class__.__name__[0] + ' ', end='')
+					if (piece.get_color() == "BLACK"):	
+						print(' ' + piece.__class__.__name__[0].lower() + ' ', end='')
+					else:
+						print(' ' + piece.__class__.__name__[0] + ' ', end='')
 				else:
 					print(' - ', end='')
 			print()
