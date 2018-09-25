@@ -40,7 +40,7 @@ class Board:
 				# Push new instance to a list.
 				self.get_pieces().append(obj)
 
-	def get_pieces(self):
+	def get_pieces(self, color = None):
 		"""It gets list of pieces on the board.
 		
 		Parameters
@@ -53,7 +53,10 @@ class Board:
 		list
 			list of pieces on the board.
 		"""
-
+		if (color == "WHITE"):
+			return [piece for piece in self.get_pieces() if piece.get_color() == "WHITE"]
+		elif (color == "BLACK"):
+			return [piece for piece in self.get_pieces() if piece.get_color() == "BLACK"]
 		return self.__list_of_pieces
 
 	def get_max_columns(self):
@@ -154,7 +157,7 @@ class Board:
 
 		return ((x < 0 or x >= self.get_max_rows()) or (y < 0 or y >= self.get_max_columns()))
 
-	def is_overlap(self, x, y):
+	def is_overlap(self, x, y, color = None):
 		"""It validates whether given x, y position is one of the current piece's location.
 		
 		Parameters
@@ -170,8 +173,7 @@ class Board:
 			returns True if x, y position is one of the current piece's location on the board,
 			otherwise False.
 		"""
-
-		for piece in self.get_pieces() :
+		for piece in self.get_pieces(color) :
 			if (piece.get_x() == x) and (piece.get_y() == y):
 				return True
 
@@ -240,7 +242,38 @@ class Board:
 		
 		return possible_moves
 
-	def calculate_heuristic(self):
+	def count_attack(self, enemy = False):
+		colors = ['WHITE', 'BLACK']
+		# Set initiate value.
+		value = 0
+
+		# Calculate attack within friends.
+		for color in colors:
+			if (enemy) :
+				colors.remove(color)
+				opponent_color = colors.pop()
+			else:
+				opponent_color = color
+			for piece in (self.get_pieces(color)):
+				for rule in (piece.get_rules()):
+					if isinstance(piece, Knight):
+						current_move = rule()
+						if (not self.is_out_of_bound(current_move['x'], current_move['y'])):
+							if (self.is_overlap(current_move['x'], current_move['y'], opponent_color)):
+								value += 1
+								break
+					else:
+						i = 1
+						current_move = rule(i)
+						while (not self.is_out_of_bound(current_move['x'], current_move['y'])):
+							if (self.is_overlap(current_move['x'], current_move['y'], opponent_color)):
+								value += 1
+								break
+							i+=1
+							current_move = rule(i)
+		return value
+
+	def calculate_heuristic(self, enemy = False):
 		"""It calculates the heuristic value of current pieces locations.
 
 		Foreach pieces on the current list of pieces:
@@ -252,27 +285,33 @@ class Board:
 		int
 			heuristic value
 		"""
+		a = self.count_attack(False)
+		b = self.count_attack(True)
+		return {
+			'a': a,
+			'b': b,
+			'total': b - a,
+		}
+		# value = 0
+		# for piece in (self.get_pieces()):
+		# 	for rule in (piece.get_rules()):
+		# 		if isinstance(piece, Knight):
+		# 			current_move = rule()
+		# 			if (not self.is_out_of_bound(current_move['x'], current_move['y'])):
+		# 				if (self.is_overlap(current_move['x'], current_move['y'])):
+		# 					value += 1
+		# 					break
+		# 		else:
+		# 			i = 1
+		# 			current_move = rule(i)
+		# 			while (not self.is_out_of_bound(current_move['x'], current_move['y'])):
+		# 				if (self.is_overlap(current_move['x'], current_move['y'])):
+		# 					value += 1
+		# 					break
+		# 				i+=1
+		# 				current_move = rule(i)
 
-		value = 0
-		for piece in (self.get_pieces()):
-			for rule in (piece.get_rules()):
-				if isinstance(piece, Knight):
-					current_move = rule()
-					if (not self.is_out_of_bound(current_move['x'], current_move['y'])):
-						if (self.is_overlap(current_move['x'], current_move['y'])):
-							value += 1
-							break
-				else:
-					i = 1
-					current_move = rule(i)
-					while (not self.is_out_of_bound(current_move['x'], current_move['y'])):
-						if (self.is_overlap(current_move['x'], current_move['y'])):
-							value += 1
-							break
-						i+=1
-						current_move = rule(i)
-
-		return value
+		# return value
 
 	def draw(self):
 		"""It draws location of current board.
@@ -288,7 +327,10 @@ class Board:
 						found = True
 						break
 				if found:
-					print(' ' + piece.__class__.__name__[0] + ' ', end='')
+					if (piece.get_color() == "BLACK"):	
+						print(' ' + piece.__class__.__name__[0].lower() + ' ', end='')
+					else:
+						print(' ' + piece.__class__.__name__[0] + ' ', end='')
 				else:
 					print(' - ', end='')
 			print()

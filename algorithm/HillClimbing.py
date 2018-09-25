@@ -25,8 +25,8 @@ class HillClimbing:
 		self.__MAX_ATTEMPTS = max_attempts
 		# If option is 1 then use first choice hill climbing, otherwise stochastic.
 		if (option == 1):
-			self.first_choice()
-		self.stochastic()
+			return self.first_choice()
+		return self.stochastic()
 	
 	def get_request(self):
 		"""It gets request from file.
@@ -67,7 +67,7 @@ class HillClimbing:
 		# Start iteration.
 		attempts = 1
 		start = round(time(), 3)
-
+		current_heuristic = None
 		# Loop until max attempts are reached.
 		while (attempts <= self.get_max_attempt()):
 			print("Attempts\t= " + str(attempts))
@@ -78,7 +78,7 @@ class HillClimbing:
 			# Define local maxima.
 			local_maxima = False
 			# Loop until goal heuristic and local maxima is reached.
-			while ((current_heuristic > 0) and (not local_maxima)):
+			while ((current_heuristic['a'] > 0) and (not local_maxima)):
 				# Get piece queue.
 				piece_queue = board.random_pick(True)
 				# Better state is defined as the heuristic is better than current heuristic.
@@ -104,7 +104,7 @@ class HillClimbing:
 						# Calculate heuristic after change to new position.
 						heuristic = board.calculate_heuristic()
 						# Accept proposed move, if heuristic is better than current heuristic.
-						if (heuristic < current_heuristic):
+						if (heuristic['total'] > current_heuristic['total']):
 							current_heuristic = heuristic
 							better_state = True
 							break
@@ -116,16 +116,13 @@ class HillClimbing:
 				# that gives a better heuristic.
 				if (not better_state):
 					local_maxima = True
-			# Goal has reached.
-			if (current_heuristic == 0):
+			if (local_maxima):
 				finish = round(time(), 3)
-				os.system('clear')
 				print("Yeay, solution found after", attempts, "attempt(s)!")
 				print("Elapsed time = " + str(finish-start) + " seconds\n")
 				board.draw()
-				print("  ", str(board.calculate_heuristic()), " 0")
+				print("  ", current_heuristic['a'], '', current_heuristic['b'])
 				return
-
 			# Restart attempt.
 			attempts += 1
 			sleep(0.03)
@@ -138,7 +135,8 @@ class HillClimbing:
 		print("This might be because you've exceeded the maximum attempts.")
 		print("Elapsed time = " + str(finish-start) + " seconds\n")
 		board.draw()
-		print("  ", str(board.calculate_heuristic()), " 0")
+		current_heuristic = board.calculate_heuristic()
+		print("  ", current_heuristic['a'], '', current_heuristic['b'])
 		return
 
 	def stochastic(self):
