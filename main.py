@@ -1,4 +1,6 @@
-from algorithm import *
+from Board import Board
+from pieces import Bishop, Knight, Queen, Rook
+from algorithm import HillClimbing, SimulatedAnnealing
 
 def file_handler(file_name):
     """Create dictionary of chess pieces.
@@ -28,16 +30,24 @@ def file_handler(file_name):
 
     return result_dict
 
-
-### Main
-### Baca file dengan method raw_input
+### MAIN ###
 # file_name = raw_input("Enter the file name: ")
 file_name = 'input.txt'
-print file_handler(file_name)
-
-### Board test cases
 request = file_handler(file_name)
 
-## Using SimulatedAnnealing
-simulated_annealing = SimulatedAnnealing(request)
-simulated_annealing.start()
+### BOARD ###
+# board = Board(request)
+# print("Heuristic:", board.calculate_heuristic())
+# board.draw()
+
+### HILL CLIMBING ###
+# First Choice Hill Climbing
+# HillClimbing(request, 1, 10)
+# Stochastic Hill Climbing
+# HillClimbing(request, 2, 10)
+
+### SIMULATED ANNEALING ###
+# simulated_annealing = SimulatedAnnealing(board)
+# simulated_annealing.start(request)
+
+
