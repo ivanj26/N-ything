@@ -42,7 +42,7 @@ request = file_handler(file_name)
 
 ### HILL CLIMBING ###
 # First Choice Hill Climbing
-HillClimbing(request, 1, 10)
+# HillClimbing(request, 1, 10)
 # Stochastic Hill Climbing
 # HillClimbing(request, 2, 10)
 

@@ -2,9 +2,9 @@ from __future__ import print_function
 import os, sys
 sys.path.append('../')
 sys.path.append('../pieces')
+from time import time
 from Board import Board
 from random import randint
-from time import sleep, time
 from pieces import Bishop, Knight, Queen, Rook
 
 class HillClimbing:
@@ -21,6 +21,7 @@ class HillClimbing:
 			number of max restart.
 		"""
 
+		self.__GOAL = None
 		self.__REQUEST = request
 		self.__MAX_ATTEMPTS = max_attempts
 		# If option is 1 then use first choice hill climbing, otherwise stochastic.
@@ -38,6 +39,32 @@ class HillClimbing:
 		"""
 
 		return self.__REQUEST
+
+	def get_goal(self):
+		"""It returns goal for this algorithm that is expected to be achieved.
+		
+		Returns
+		-------
+		int
+			heuristic goal to be achieved.
+		"""
+
+		return self.__GOAL
+
+	def set_goal(self, color_count):
+		"""It sets a goal that is expected to be achieved.
+		
+		Parameters
+		----------
+		color_count : int
+			Total chess piece colors variant.
+		
+		"""
+
+		if (color_count == 1):
+			self.__GOAL = 0
+		else:
+			self.__GOAL = 9999
 
 	def get_max_attempt(self):
 		"""It gets max_attempts param.
@@ -68,29 +95,31 @@ class HillClimbing:
 		attempts = 1
 		start = round(time(), 3)
 		current_heuristic = None
-		# Loop until max attempts are reached.
+		# Iterate until max attempts are reached.
 		while (attempts <= self.get_max_attempt()):
 			print("Attempts\t= " + str(attempts))
 			# Create board object.
 			board = Board(self.get_request())
+			# Set a goal heuristic.
+			self.set_goal(len(board.get_colors()))
 			# Calculate current heuristic.
 			current_heuristic = board.calculate_heuristic()
 			# Define local maxima.
 			local_maxima = False
-			# Loop until goal heuristic and local maxima is reached.
-			while ((current_heuristic['a'] > 0) and (not local_maxima)):
+			# Iterate until goal heuristic and local maxima is reached.
+			while ((current_heuristic['total'] < self.get_goal()) and (not local_maxima)):
 				# Get piece queue.
 				piece_queue = board.random_pick(True)
 				# Better state is defined as the heuristic is better than current heuristic.
 				better_state = False
-				# Loop until all pieces has gotten turn or there is a better state.
+				# Iterate until all pieces has gotten turn or there is a better state.
 				while ((len(piece_queue) > 0) and (not better_state)):
 					# Get one piece to get turn.
 					current_piece = piece_queue.pop()
 					# Original position
 					original_position =  {
-						'y': current_piece.get_y(),
 						'x': current_piece.get_x(),
+						'y': current_piece.get_y(),
 					}
 					# Get list of all possible moves.
 					possible_moves = board.random_move(True)
@@ -116,8 +145,10 @@ class HillClimbing:
 				# that gives a better heuristic.
 				if (not better_state):
 					local_maxima = True
-			if (local_maxima):
+			# Exits code when goal has achieved, or local maxima achieved with max attempts.
+			if (current_heuristic['total'] == self.get_goal()):
 				finish = round(time(), 3)
+				os.system('clear')
 				print("Yeay, solution found after", attempts, "attempt(s)!")
 				print("Elapsed time = " + str(finish-start) + " seconds\n")
 				board.draw()
@@ -125,14 +156,13 @@ class HillClimbing:
 				return
 			# Restart attempt.
 			attempts += 1
-			sleep(0.03)
 			os.system('clear')
 
 		# Maximum attempts reached.
 		finish = round(time(), 3)
 		os.system('clear')
-		print("Unfortunately, solution not found after", attempts-1, "attempt(s)!")
-		print("This might be because you've exceeded the maximum attempts.")
+		print("Unfortunately, solution not found after", attempts - 1, "attempt(s)!")
+		print("This might because you've exceeded the maximum attempts.")
 		print("Elapsed time = " + str(finish-start) + " seconds\n")
 		board.draw()
 		current_heuristic = board.calculate_heuristic()
@@ -152,33 +182,36 @@ class HillClimbing:
 			7. Restart initial state, if necessary.
 
 		"""
+
 		# Start iteration.
 		attempts = 1
 		start = round(time(), 3)
-
-		# Loop until max attempts are reached.
+		current_heuristic = None
+		# Iterate until max attempts are reached.
 		while (attempts <= self.get_max_attempt()):
 			print("Attempts\t= " + str(attempts))
 			# Create board object.
 			board = Board(self.get_request())
+			# Set a goal heuristic.
+			self.set_goal(len(board.get_colors()))
 			# Calculate current heuristic.
 			current_heuristic = board.calculate_heuristic()
 			# Define local maxima.
 			local_maxima = False
-			# Loop until goal heuristic and local maxima is reached.
-			while ((current_heuristic > 0) and (not local_maxima)):
+			# Iterate until goal heuristic and local maxima is reached.
+			while ((current_heuristic['total'] < self.get_goal()) and (not local_maxima)):
 				# Get piece queue.
 				piece_queue = board.random_pick(True)
 				# Better state is defined as the heuristic is better than current heuristic.
 				better_states = []
-				# Loop until all pieces has gotten turn or there is a list of better states.
+				# Iterate until all pieces has gotten turn or there is a better state.
 				while ((len(piece_queue) > 0) and (len(better_states) == 0)):
 					# Get one piece to get turn.
 					current_piece = piece_queue.pop()
 					# Original position
 					original_position =  {
-						'y': current_piece.get_y(),
 						'x': current_piece.get_x(),
+						'y': current_piece.get_y(),
 					}
 					# Get list of all possible moves.
 					possible_moves = board.random_move(True)
@@ -192,15 +225,16 @@ class HillClimbing:
 						# Calculate heuristic after change to new position.
 						heuristic = board.calculate_heuristic()
 						# Accept proposed move, if heuristic is better than current heuristic.
-						if (heuristic < current_heuristic):
+						if (heuristic['total'] > current_heuristic['total']):
 							# Add to list of better_states
 							better_states.append(current_move)
-						#Restore the position of piece, not accept the changes
-						current_piece.set_x(original_position['x'])
-						current_piece.set_y(original_position['y'])
+						else:
+							#Restore the position of piece, not accept the changes
+							current_piece.set_x(original_position['x'])
+							current_piece.set_y(original_position['y'])
 					# There is/are better states, then choose randomly.
 					if (len(better_states) > 0):
-						idx = randint(0, len(better_states)-1)
+						idx = randint(0, len(better_states) - 1)
 						chosen_move = better_states[idx]
 						# Replace current position of piece with chosen move.
 						current_piece.set_x(chosen_move['x'])
@@ -212,27 +246,26 @@ class HillClimbing:
 				# that gives a better heuristic.
 				if (len(better_states) == 0):
 					local_maxima = True
-			# Goal has reached.
-			if (current_heuristic == 0):
+			# Exits code when goal has achieved, or local maxima achieved with max attempts.
+			if (current_heuristic['total'] == self.get_goal()):
 				finish = round(time(), 3)
 				os.system('clear')
 				print("Yeay, solution found after", attempts, "attempt(s)!")
 				print("Elapsed time = " + str(finish-start) + " seconds\n")
 				board.draw()
-				print("  ", str(board.calculate_heuristic()), " 0")
+				print("  ", current_heuristic['a'], '', current_heuristic['b'])
 				return
-
 			# Restart attempt.
 			attempts += 1
-			sleep(0.03)
 			os.system('clear')
 
 		# Maximum attempts reached.
 		finish = round(time(), 3)
 		os.system('clear')
-		print("Unfortunately, solution not found after", attempts-1, "attempt(s)!")
-		print("This might be because you've exceeded the maximum attempts.")
+		print("Unfortunately, solution not found after", attempts - 1, "attempt(s)!")
+		print("This might because you've exceeded the maximum attempts.")
 		print("Elapsed time = " + str(finish-start) + " seconds\n")
 		board.draw()
-		print("  ", str(board.calculate_heuristic()), " 0")
+		current_heuristic = board.calculate_heuristic()
+		print("  ", current_heuristic['a'], '', current_heuristic['b'])
 		return
