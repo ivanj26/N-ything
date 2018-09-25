@@ -8,18 +8,46 @@ sys.path.append('../')
 sys.path.append('../pieces')
 
 from random import random
-from pieces import *
+from pieces import ChessPiece
 from Board import Board
 
 class SimulatedAnnealing:
-    def __init__(self, board):
+    def __init__(self, request):
+        """This constructs SimulatedAnnealing instance and create Board object.
+
+        Parameters
+        ----------
+        request : dictionary
+            Dictionary of list of piece.
+
+        Returns
+        -------
+        nothing
+        """
         self.__TEMP = 100
         self.__COOLING_RATE = 0.95
         self.__MAX_ATTEMPTS = 50000
 
-        self.__board = board
+        self.__request = request
+        self.__board = Board(request)
 
     def print_immediately(self, attempts, current_heuristic, temp):
+        """This method prints Board UI.
+
+        Parameters
+        ----------
+        attempts : int
+            Current attempts in t.
+        current_heuristic : int
+            Current heuristic in t.
+        temp : int
+            Current temperature in t.
+
+        Returns
+        -------
+        void
+            Prints Board UI.
+        """
         print("Attempts\t\t= " + str(attempts))
         print("Current Heuristic\t= " + str(current_heuristic))
         print("Current Temperature\t= " + str(temp), end='\n\n')
@@ -28,12 +56,48 @@ class SimulatedAnnealing:
         os.system('clear')
 
     def cooling_down(self, temp):
+        """This method returns temp after cooling down.
+
+        Parameters
+        ----------
+        temp : int
+            Current temperature to cool down.
+
+        Returns
+        -------
+        int
+            returns colder temperature.
+
+        """
         return temp * self.__COOLING_RATE
 
     def boltzman_dist(self, e1, e, temp):
+        """This method performs boltzman distribution where exp(-(loss/temp)).
+
+        Parameters
+        ----------
+        e1 : int
+            Neighbor's heuristic.
+        e : int
+            Current heuristic.
+        temp : int
+            Current temperature.
+
+        Returns
+        -------
+        int
+            Probability by boltzman.
+
+        """
         return math.exp((e - e1) / temp)
 
-    def start(self, request):
+    def start(self):
+        """This method performs simulated annealing algorithm.
+
+        Returns
+        -------
+        void
+        """
         attempts = 1
 
         #Calculate current heuristic
@@ -92,7 +156,7 @@ class SimulatedAnnealing:
                 return
 
             #Restart by reinitialize the board
-            self.__board = Board(request)
+            self.__board = Board(self.__request)
 
             #Calculate current heuristic
             current_heuristic = self.__board.calculate_heuristic()
@@ -102,25 +166,10 @@ class SimulatedAnnealing:
             sleep(0.03)
             os.system('clear')
 
-        return "You've exceeded the maximum attempts!"
+        finish = round(time(), 3)
 
+        print("Heuristic\t= " + str(self.__board.calculate_heuristic()))
+        print("Time\t\t= " + str(finish-start) + " seconds")
+        print("You've exceeded the maximum attempts!\n")
 
-# class A:
-#     def __init__(self):
-#         self.__number = [1,2,3,4,5]
-#
-#     def get_pieces(self):
-#         return self.__number
-#
-#     def print_all_pieces(self):
-#         for i in self.__number:
-#             print(i)
-# class B:
-#     def __init__(self, a):
-#         numbers = a.get_pieces()
-#         numbers[2] = 10
-#
-#         a.print_all_pieces()
-#
-# a = A()
-# b = B(a)
+        self.__board.draw()
