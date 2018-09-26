@@ -1,6 +1,7 @@
 from __future__ import print_function
 from time import sleep
 from time import time
+from copy import copy
 import os
 import sys
 import math
@@ -12,7 +13,7 @@ from pieces import ChessPiece
 from Board import Board
 
 class SimulatedAnnealing:
-    def __init__(self, request):
+    def __init__(self, request, max_attempts):
         """This constructs SimulatedAnnealing instance and create Board object.
 
         Parameters
@@ -26,7 +27,7 @@ class SimulatedAnnealing:
         """
         self.__TEMP = 100
         self.__COOLING_RATE = 0.95
-        self.__MAX_ATTEMPTS = 50000
+        self.__MAX_ATTEMPTS = max_attempts
 
         self.__request = request
         self.__board = Board(request)
@@ -93,15 +94,25 @@ class SimulatedAnnealing:
 
     def start(self):
         """This method performs simulated annealing algorithm.
-
         Returns
         -------
         void
         """
         attempts = 1
+        colors = len(self.__board.get_colors())
+
+        #Best Heuristic and board condition
+        best = None
+        best_board = None
 
         #Calculate current heuristic
-        current_heuristic = self.__board.calculate_heuristic()
+        current_heuristic = 0
+        if (colors == 1):
+            current_heuristic = self.__board.calculate_heuristic()['a']
+            best = 999
+        else:
+            current_heuristic = self.__board.calculate_heuristic()['total']
+            best = -999
 
         #Start
         start = round(time(), 3)
@@ -130,24 +141,51 @@ class SimulatedAnnealing:
                 piece.set_y(rand_position['y'])
 
                 #Calculate heuristic after change to new position
-                heuristic = self.__board.calculate_heuristic()
-
-                if (current_heuristic > heuristic):
-                    #Absolutely accept the changes, get minimum heuristic
-                    current_heuristic = heuristic
+                heuristic = 0
+                if (colors == 1):
+                    heuristic = self.__board.calculate_heuristic()['a']
                 else:
-                    probability = self.boltzman_dist(heuristic, current_heuristic, temp)
-                    if (random() <= probability):
-                        #Accept the changes
+                    heuristic = self.__board.calculate_heuristic()['total']
+
+                if (colors == 1):
+                    if (current_heuristic > heuristic):
+                        #Absolutely accept the changes, get minimum heuristic
                         current_heuristic = heuristic
                     else:
-                        #Restore the position of piece, not accept the changes
-                        piece.set_x(old_position['x'])
-                        piece.set_y(old_position['y'])
+                        probability = self.boltzman_dist(heuristic, current_heuristic, temp)
+                        if (random() <= probability):
+                            #Accept the changes
+                            current_heuristic = heuristic
+                        else:
+                            #Restore the position of piece, not accept the changes
+                            piece.set_x(old_position['x'])
+                            piece.set_y(old_position['y'])
 
-                    temp = self.cooling_down(temp)
+                        temp = self.cooling_down(temp)
+                    if (best > current_heuristic):
+                        best = current_heuristic
+                        best_board = copy(self.__board)
+                else:
+                    if (current_heuristic < heuristic):
+                        #Absolutely accept the changes, get maximum heuristic
+                        current_heuristic = heuristic
+                    else:
+                        probability = self.boltzman_dist(heuristic, current_heuristic, temp)
+                        if (random() <= probability):
+                            #Accept the changes
+                            current_heuristic = heuristic
+                        else:
+                            #Restore the position of piece, not accept the changes
+                            piece.set_x(old_position['x'])
+                            piece.set_y(old_position['y'])
 
-            if (current_heuristic == 0):
+                        temp = self.cooling_down(temp)
+
+                    if (best < current_heuristic):
+                        best = current_heuristic
+                        best_board = copy(self.__board)
+
+            if (current_heuristic == 0 and colors == 1):
                 finish = round(time(), 3)
                 print("Heuristic\t= " + str(self.__board.calculate_heuristic()))
                 print("Time\t\t= " + str(finish-start) + " seconds\n")
@@ -159,7 +197,11 @@ class SimulatedAnnealing:
             self.__board = Board(self.__request)
 
             #Calculate current heuristic
-            current_heuristic = self.__board.calculate_heuristic()
+            current_heuristic = 0
+            if (colors == 1):
+                current_heuristic = self.__board.calculate_heuristic()['a']
+            else:
+                current_heuristic = self.__board.calculate_heuristic()['total']
 
             #Increment the attempts
             attempts+=1
@@ -168,8 +210,12 @@ class SimulatedAnnealing:
 
         finish = round(time(), 3)
 
-        print("Heuristic\t= " + str(self.__board.calculate_heuristic()))
+        print("This is the best we can do with " + str(self.__MAX_ATTEMPTS) + " attempts :)")
+        if (colors == 1):
+            print("Heuristic\t= " + str(best) + " 0")
+        else:
+            print("Heuristic\t= " + str(best_board.calculate_heuristic()['a']) + " " + str(best))
         print("Time\t\t= " + str(finish-start) + " seconds")
         print("You've exceeded the maximum attempts!\n")
 
-        self.__board.draw()
+        best_board.draw()

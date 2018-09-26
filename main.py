@@ -47,7 +47,5 @@ request = file_handler(file_name)
 # HillClimbing(request, 2, 10)
 
 ### SIMULATED ANNEALING ###
-# simulated_annealing = SimulatedAnnealing(board)
-# simulated_annealing.start(request)
-
-
+simulated_annealing = SimulatedAnnealing(request, 100)
+simulated_annealing.start()
