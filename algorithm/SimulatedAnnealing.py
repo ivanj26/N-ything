@@ -170,7 +170,7 @@ class SimulatedAnnealing:
                         #Absolutely accept the changes, get maximum heuristic
                         current_heuristic = heuristic
                     else:
-                        probability = self.boltzman_dist(heuristic, current_heuristic, temp)
+                        probability = self.boltzman_dist(current_heuristic, heuristic, temp)
                         if (random() <= probability):
                             #Accept the changes
                             current_heuristic = heuristic
