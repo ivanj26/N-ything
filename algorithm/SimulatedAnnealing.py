@@ -72,7 +72,7 @@ class SimulatedAnnealing:
         """
         return temp * self.__COOLING_RATE
 
-    def boltzman_dist(self, e1, e, temp):
+    def boltzman_dist(self, e, e1, temp):
         """This method performs boltzman distribution where exp(-(loss/temp)).
 
         Parameters
@@ -90,7 +90,7 @@ class SimulatedAnnealing:
             Probability by boltzman.
 
         """
-        return math.exp((e - e1) / temp)
+        return math.exp((e1 - e) / temp)
 
     def start(self):
         """This method performs simulated annealing algorithm.
@@ -101,18 +101,8 @@ class SimulatedAnnealing:
         attempts = 1
         colors = len(self.__board.get_colors())
 
-        #Best Heuristic and board condition
-        best = None
-        best_board = None
-
         #Calculate current heuristic
-        current_heuristic = 0
-        if (colors == 1):
-            current_heuristic = self.__board.calculate_heuristic()['a']
-            best = 999
-        else:
-            current_heuristic = self.__board.calculate_heuristic()['total']
-            best = -999
+        current_heuristic = self.__board.calculate_heuristic()
 
         #Start
         start = round(time(), 3)
@@ -123,7 +113,7 @@ class SimulatedAnnealing:
             print("Attempts\t= " + str(attempts))
 
             #when temp < 1 -> prob nearly to zero
-            while (temp > 1 and current_heuristic != 0):
+            while (temp > 1 and current_heuristic['total'] != 0):
                 # For the fastest performance, do not update Board UI
                 # self.print_immediately(attempts, current_heuristic, temp);
 
@@ -141,81 +131,51 @@ class SimulatedAnnealing:
                 piece.set_y(rand_position['y'])
 
                 #Calculate heuristic after change to new position
-                heuristic = 0
-                if (colors == 1):
-                    heuristic = self.__board.calculate_heuristic()['a']
-                else:
-                    heuristic = self.__board.calculate_heuristic()['total']
+                heuristic = self.__board.calculate_heuristic()
 
-                if (colors == 1):
-                    if (current_heuristic > heuristic):
-                        #Absolutely accept the changes, get minimum heuristic
+                if (current_heuristic['total'] < heuristic['total']):
+                    #Absolutely accept the changes, get maximum heuristic
+                    current_heuristic = heuristic
+                else:
+                    probability = self.boltzman_dist(current_heuristic['total'], heuristic['total'], temp)
+                    if (random() <= probability):
+                        #Accept the changes
                         current_heuristic = heuristic
                     else:
-                        probability = self.boltzman_dist(heuristic, current_heuristic, temp)
-                        if (random() <= probability):
-                            #Accept the changes
-                            current_heuristic = heuristic
-                        else:
-                            #Restore the position of piece, not accept the changes
-                            piece.set_x(old_position['x'])
-                            piece.set_y(old_position['y'])
+                        #Restore the position of piece, not accept the changes
+                        piece.set_x(old_position['x'])
+                        piece.set_y(old_position['y'])
 
-                        temp = self.cooling_down(temp)
-                    if (best > current_heuristic):
-                        best = current_heuristic
-                        best_board = copy(self.__board)
-                else:
-                    if (current_heuristic < heuristic):
-                        #Absolutely accept the changes, get maximum heuristic
-                        current_heuristic = heuristic
-                    else:
-                        probability = self.boltzman_dist(current_heuristic, heuristic, temp)
-                        if (random() <= probability):
-                            #Accept the changes
-                            current_heuristic = heuristic
-                        else:
-                            #Restore the position of piece, not accept the changes
-                            piece.set_x(old_position['x'])
-                            piece.set_y(old_position['y'])
+                    temp = self.cooling_down(temp)
 
-                        temp = self.cooling_down(temp)
-
-                    if (best < current_heuristic):
-                        best = current_heuristic
-                        best_board = copy(self.__board)
-
-            if (current_heuristic == 0 and colors == 1):
+            if (current_heuristic['total'] == 0 and colors == 1):
                 finish = round(time(), 3)
-                print("Heuristic\t= " + str(self.__board.calculate_heuristic()))
-                print("Time\t\t= " + str(finish-start) + " seconds\n")
-
-                self.__board.draw()
+                os.system('clear')
+                print("Yeay, solution found after", str(attempts), "attempt(s)!")
+                print("Elapsed time = " + str(finish-start) + " seconds\n")
+                board.draw()
+                print("  ", str(current_heuristic['a']), '', str(current_heuristic['b']))
                 return
 
             #Restart by reinitialize the board
             self.__board = Board(self.__request)
 
             #Calculate current heuristic
-            current_heuristic = 0
-            if (colors == 1):
-                current_heuristic = self.__board.calculate_heuristic()['a']
-            else:
-                current_heuristic = self.__board.calculate_heuristic()['total']
+            current_heuristic = self.__board.calculate_heuristic()
 
             #Increment the attempts
             attempts+=1
             sleep(0.03)
             os.system('clear')
 
+        #Maximum attempts reached
         finish = round(time(), 3)
 
-        print("This is the best we can do with " + str(self.__MAX_ATTEMPTS) + " attempts :)")
-        if (colors == 1):
-            print("Heuristic\t= " + str(best) + " 0")
-        else:
-            print("Heuristic\t= " + str(best_board.calculate_heuristic()['a']) + " " + str(best))
-        print("Time\t\t= " + str(finish-start) + " seconds")
-        print("You've exceeded the maximum attempts!\n")
+        os.system('clear')
+        print("Unfortunately, solution not found after", attempts , "attempt(s)!")
+        print("This might because you've exceeded the maximum attempts.")
+        print("Elapsed time = " + str(finish-start) + " seconds\n")
 
-        best_board.draw()
+        #Draw board
+        self.__board.draw()
+        print(" ", str(current_heuristic['a']) , " ", str(current_heuristic['b']))
