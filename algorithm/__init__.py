@@ -1,2 +1,3 @@
 from HillClimbing import HillClimbing
 from SimulatedAnnealing import SimulatedAnnealing
+from GeneticAlgorithm import GeneticAlgorithm

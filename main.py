@@ -1,6 +1,6 @@
 from Board import Board
 from pieces import Bishop, Knight, Queen, Rook
-from algorithm import HillClimbing, SimulatedAnnealing
+from algorithm import HillClimbing, SimulatedAnnealing, GeneticAlgorithm
 
 def file_handler(file_name):
     """Create dictionary of chess pieces.
@@ -35,9 +35,9 @@ def file_handler(file_name):
 file_name = 'input.txt'
 request = file_handler(file_name)
 
-### BOARD ###
-# board = Board(request)
-# print("Heuristic:", board.calculate_heuristic())
+## BOARD ###
+board = Board(request)
+# print("Heuristic:", board.calculate_heuristic()['total'])
 # board.draw()
 
 ### HILL CLIMBING ###
@@ -49,5 +49,9 @@ request = file_handler(file_name)
 ### SIMULATED ANNEALING ###
 # simulated_annealing = SimulatedAnnealing(board)
 # simulated_annealing.start(request)
+
+### GENETIC ALGORITHM ###
+genetic_algorithm = GeneticAlgorithm(request)
+genetic_algorithm.start()
 
 
