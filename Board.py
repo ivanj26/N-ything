@@ -100,6 +100,7 @@ class Board:
 
 		return self.__MAX_ROWS
 
+	@classmethod
 	def convert_to_grid(self, x, y):
 		"""It converts x,y-axis to grid systems.
 		
@@ -118,6 +119,7 @@ class Board:
 
 		return (y*8 + x)
 
+	@classmethod
 	def convert_to_axis(self, value):
 		"""It converts grid system to x,y-axis.
 		

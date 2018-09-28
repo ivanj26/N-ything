@@ -13,16 +13,17 @@ from Board import Board
 
 class GeneticAlgorithm:
     def __init__(self, request):
-        self.__MUTATION_PROB = 0.8
-        self.__MAX_ATTEMPTS = 1000
-        self.__MAX_POPULATION = 50
+        self.__MUTATION_PROB = 0.5
+        self.__MAX_ATTEMPTS = 10000
+        self.__MAX_POPULATION = 16
         self.__SUM_COLORS = len(Board(request).get_colors())
         self.__population = []
 
         for _ in range(self.__MAX_POPULATION):
-            self.__population.append(Board(request))
+            self.__population.append(Board(request))   
         
         self.sort_population()
+        
         self.__best_board = self.__population[0]
     
     def get_fitness(self, board):
@@ -44,18 +45,32 @@ class GeneticAlgorithm:
         pieces1 = parent1.get_pieces()
         pieces2 = parent2.get_pieces()
 
-        cross_point = randint(0, len(pieces1)-1)
+        grid1 = []
+        grid2 = []
+        for i in range(len(parent1.get_pieces())):
+            grid1.append(parent1.convert_to_grid(
+                pieces1[i].get_x(),
+                pieces1[i].get_y()
+            ))
+            grid2.append(parent2.convert_to_grid(
+                pieces2[i].get_x(),
+                pieces2[i].get_y()
+            ))        
         
-        child1 = pieces1[0:cross_point+1] + pieces2[cross_point:len(pieces1)]
-        child2 = pieces2[0:cross_point+1] + pieces1[cross_point:len(pieces1)]
-        
-        print(len(parent1.get_pieces()))
+        cross_point = randint(0, len(grid1)-1)
 
-        parent1.set_pieces(child1)
-        parent2.set_pieces(child2)
-        
-        print(len(parent1.get_pieces()))
+        grid_child1 = grid1[0:cross_point+1] + grid2[cross_point+1:len(grid2)]
+        grid_child2 = grid2[0:cross_point+1] + grid1[cross_point+1:len(grid1)]
 
+        for i in range(len(pieces1)):
+            pieces1[i].set_x(Board.convert_to_axis(grid_child1[i])['x'])
+            pieces1[i].set_y(Board.convert_to_axis(grid_child1[i])['y'])
+
+            pieces2[i].set_x(Board.convert_to_axis(grid_child2[i])['x'])
+            pieces2[i].set_y(Board.convert_to_axis(grid_child2[i])['y'])
+                
+        parent1.set_pieces(pieces1)
+        parent2.set_pieces(pieces2)
         return [parent1, parent2]
         
     def stop_searching(self):
@@ -69,8 +84,19 @@ class GeneticAlgorithm:
         while attempt <= self.__MAX_ATTEMPTS:
             total_pair = len(self.__population) if len(self.__population)%2 == 0 else len(self.__population)-1
             new_population = []
+
+            # print("Before")
+            # for board in self.__population:
+            #     print("len board :", len(board.get_pieces()))
+
             for i in [el for el in list(range(total_pair)) if el % 2 == 0]:
                 new_population = new_population + self.reproduce(self.__population[i], self.__population[i+1])
+
+            # print("After")
+            # for board in self.__population:
+            #     print("len board :", len(board.get_pieces()))
+
+
             self.__population = new_population
             for board in self.__population:
                 if random() < self.__MUTATION_PROB:
@@ -83,15 +109,16 @@ class GeneticAlgorithm:
                 self.get_fitness(self.__population[0]) > self.get_fitness(self.__best_board)
             ) else self.__best_board
 
+            print("Attempt :", attempt)
+            print("Best Heuristic :", self.__best_board.calculate_heuristic()['total'])
+            self.__best_board.draw()
+
             if self.stop_searching():
                 break
             
             attempt = attempt+1
 
-            print("Attempt :", attempt)
-            print("Best Heuristic :", self.__best_board.calculate_heuristic()['total'])
-        
-            self.__best_board.draw()
+            
 
     
 
