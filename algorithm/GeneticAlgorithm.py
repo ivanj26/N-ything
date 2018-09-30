@@ -140,6 +140,9 @@ class GeneticAlgorithm:
                 
                 generation = generation + 1
 
+            if self.stop_searching():
+                break
+            
             self.assign_population(self.__request)
             attempt = attempt + 1
 
