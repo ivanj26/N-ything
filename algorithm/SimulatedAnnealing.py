@@ -101,6 +101,12 @@ class SimulatedAnnealing:
         attempts = 1
         colors = len(self.__board.get_colors())
 
+        best = None
+        best_board = None
+
+        if (colors > 1):
+            best = {'a' : 0, 'b' : -999 ,'total': -999}
+
         #Calculate current heuristic
         current_heuristic = self.__board.calculate_heuristic()
 
@@ -148,6 +154,10 @@ class SimulatedAnnealing:
 
                     temp = self.cooling_down(temp)
 
+                if (best['total'] < current_heuristic['total']):
+                    best = current_heuristic
+                    best_board = copy(self.__board)
+
             if (current_heuristic['total'] == 0 and colors == 1):
                 finish = round(time(), 3)
                 os.system('clear')
@@ -172,6 +182,22 @@ class SimulatedAnnealing:
         finish = round(time(), 3)
 
         os.system('clear')
+
+        #If colors > 1, and current_heuristic < best
+        if (colors > 1):
+            print("S.A Algorithm approximates global optimum (with ", attempts, " attempts)")
+            print("Elapsed time = " + str(finish - start) + " seconds\n")
+
+            #Draw best Board
+            if (current_heuristic['total'] < best):
+                best_board.draw()
+                print(" ", best['a'] , " ", best['b'])
+            else:
+                self.__board.draw()
+                print(" ", str(current_heuristic['a']) , " ", str(current_heuristic['b']))
+
+            return
+
         print("Unfortunately, solution not found after", attempts , "attempt(s)!")
         print("This might because you've exceeded the maximum attempts.")
         print("Elapsed time = " + str(finish-start) + " seconds\n")
