@@ -176,7 +176,7 @@ class HillClimbing:
 			# Maximum attempts reached.
 			finish = round(time(), 3)
 			os.system('clear')
-			print("Hill Climbing Algorithm approximates global optimum (with ", attempts - 1, " attempts)")
+			print("First Hill Climbing Algorithm approximates global optimum (with ", attempts - 1, " attempts)")
 			print("Elapsed time = " + str(finish - start) + " seconds\n")
 
 		#Draw best Board
@@ -292,7 +292,7 @@ class HillClimbing:
 			# Maximum attempts reached.
 			finish = round(time(), 3)
 			os.system('clear')
-			print("Hill Climbing Algorithm approximates global optimum (with ", attempts - 1, " attempts)")
+			print("Stochastic Hill Climbing Algorithm approximates global optimum (with ", attempts - 1, " attempts)")
 			print("Elapsed time = " + str(finish - start) + " seconds\n")
 
 		#Draw best Board
