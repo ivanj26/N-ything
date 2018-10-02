@@ -12,7 +12,7 @@ from pieces import ChessPiece
 from Board import Board
 
 class SimulatedAnnealing:
-    def __init__(self, request):
+    def __init__(self, request, max_attempt, cooling_rate, temp):
         """This constructs SimulatedAnnealing instance and create Board object.
 
         Parameters
@@ -24,9 +24,9 @@ class SimulatedAnnealing:
         -------
         nothing
         """
-        self.__TEMP = 100
-        self.__COOLING_RATE = 0.95
-        self.__MAX_ATTEMPTS = 50000
+        self.__TEMP = temp
+        self.__COOLING_RATE = cooling_rate
+        self.__MAX_ATTEMPTS = max_attempt
 
         self.__request = request
         self.__board = Board(request)
@@ -130,7 +130,7 @@ class SimulatedAnnealing:
                 piece.set_y(rand_position['y'])
 
                 #Calculate heuristic after change to new position
-                heuristic = self.__board.calculate_heuristic()
+                heuristic = self.__board.calculate_heuristic()['total']
 
                 if (current_heuristic > heuristic):
                     #Absolutely accept the changes, get minimum heuristic

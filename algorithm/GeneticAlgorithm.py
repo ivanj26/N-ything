@@ -12,12 +12,12 @@ from pieces import ChessPiece
 from Board import Board
 
 class GeneticAlgorithm:
-    def __init__(self, request):
+    def __init__(self, request, mutation_prob, max_attempt, max_generation, max_population):
         self.__request = request
-        self.__MUTATION_PROB = 0.8
-        self.__MAX_ATTEMPTS = 20
-        self.__MAX_GENERATION = 1000
-        self.__MAX_POPULATION = 16
+        self.__MUTATION_PROB = mutation_prob
+        self.__MAX_ATTEMPTS = max_attempt
+        self.__MAX_GENERATION = max_generation
+        self.__MAX_POPULATION = max_population
         self.__SUM_COLORS = len(Board(request).get_colors())
         self.__population = []
 
