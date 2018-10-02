@@ -1,6 +1,7 @@
 from __future__ import print_function
 from time import sleep
 from time import time
+from copy import copy
 import os
 import sys
 import math
@@ -29,7 +30,7 @@ class GeneticAlgorithm:
 
         self.sort_population()
 
-        self.__best_board = self.__population[0]
+        self.__best_board = copy(self.__population[0])
 
     def get_fitness(self, board):
         return board.calculate_heuristic()['total']
@@ -102,7 +103,7 @@ class GeneticAlgorithm:
         attempt = 1
         #Start
         start = round(time(), 3)
-        while attempt < self.__MAX_ATTEMPTS:
+        while attempt <= self.__MAX_ATTEMPTS:
             generation = 1
             while generation <= self.__MAX_GENERATION:
                 total_pair = len(self.__population) if len(self.__population)%2 == 0 else len(self.__population)-1
@@ -128,14 +129,14 @@ class GeneticAlgorithm:
                         # board.draw()
 
                 self.sort_population()
-                self.__best_board = self.__population[0] if (
+                self.__best_board = copy(self.__population[0]) if (
                     self.get_fitness(self.__population[0]) > self.get_fitness(self.__best_board)
                 ) else self.__best_board
 
                 print("Generation :", generation)
                 print("Best Heuristic :", self.__best_board.calculate_heuristic()['total'])
-                self.__best_board.draw()
-                print("  ", self.__best_board.calculate_heuristic()['a'], ' ', self.__best_board.calculate_heuristic()['b'])
+                #self.__best_board.draw()
+                #print("  ", self.__best_board.calculate_heuristic()['a'], ' ', self.__best_board.calculate_heuristic()['b'])
 
                 if self.stop_searching():
                     break
@@ -145,5 +146,8 @@ class GeneticAlgorithm:
             self.assign_population(self.__request)
             attempt = attempt + 1
 
+            self.__best_board.draw()
+            print("  ", self.__best_board.calculate_heuristic()['a'], ' ', self.__best_board.calculate_heuristic()['b'])
+            
             if self.stop_searching():
                 break
