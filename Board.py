@@ -275,8 +275,10 @@ class Board:
 		# Calculate attack within friends.
 		for color in colors:
 			if (enemy) :
-				colors.remove(color)
-				opponent_color = colors.pop()
+				if (color == 'WHITE'):
+					opponent_color = 'BLACK'
+				else:
+					opponent_color = 'WHITE'
 			else:
 				opponent_color = color
 			for piece in (self.get_pieces(color)):
@@ -287,7 +289,6 @@ class Board:
 							inc = self.is_overlap(current_move['x'], current_move['y'], opponent_color)
 							if (inc != -1):
 								value += inc
-								break
 					else:
 						i = 1
 						current_move = rule(i)
