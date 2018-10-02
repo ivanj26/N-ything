@@ -106,6 +106,8 @@ class SimulatedAnnealing:
 
         if (colors > 1):
             best = {'a' : 0, 'b' : -999 ,'total': -999}
+        else:
+            best = {'a' : 999, 'b' : 0, 'total': -999}
 
         #Calculate current heuristic
         current_heuristic = self.__board.calculate_heuristic()
@@ -137,7 +139,7 @@ class SimulatedAnnealing:
                 piece.set_y(rand_position['y'])
 
                 #Calculate heuristic after change to new position
-                heuristic = self.__board.calculate_heuristic()['total']
+                heuristic = self.__board.calculate_heuristic()
 
                 if (current_heuristic['total'] < heuristic['total']):
                     #Absolutely accept the changes, get maximum heuristic
@@ -155,7 +157,7 @@ class SimulatedAnnealing:
                     temp = self.cooling_down(temp)
 
             #Check if current heuristic is better than current best
-            if (colors > 1 and best['total'] < current_heuristic['total']):
+            if (best['total'] < current_heuristic['total']):
                 best = current_heuristic
                 best_board = copy(self.__board)
 
@@ -165,7 +167,7 @@ class SimulatedAnnealing:
                 os.system('clear')
                 print("Yeay, solution found after", str(attempts), "attempt(s)!")
                 print("Elapsed time = " + str(finish-start) + " seconds\n")
-                board.draw()
+                self.__board.draw()
                 print("  ", str(current_heuristic['a']), '', str(current_heuristic['b']))
                 return
 
@@ -185,25 +187,15 @@ class SimulatedAnnealing:
 
         os.system('clear')
 
-        #If colors > 1, and current_heuristic < best
-        if (colors > 1):
-            print("S.A Algorithm approximates global optimum (with ", attempts, " attempts)")
-            print("Elapsed time = " + str(finish - start) + " seconds\n")
+        print("S.A Algorithm approximates global optimum (with ", attempts, " attempts)")
+        print("Elapsed time = " + str(finish - start) + " seconds\n")
 
-            #Draw best Board
-            if (current_heuristic['total'] < best):
-                best_board.draw()
-                print(" ", best['a'] , " ", best['b'])
-            else:
-                self.__board.draw()
-                print(" ", str(current_heuristic['a']) , " ", str(current_heuristic['b']))
+        #Draw best Board
+        if (current_heuristic['total'] < best):
+            best_board.draw()
+            print(" ", best['a'] , " ", best['b'])
+        else:
+            self.__board.draw()
+            print(" ", str(current_heuristic['a']) , " ", str(current_heuristic['b']))
 
-            return
-
-        print("Unfortunately, solution not found after", attempts , "attempt(s)!")
-        print("This might because you've exceeded the maximum attempts.")
-        print("Elapsed time = " + str(finish-start) + " seconds\n")
-
-        #Draw board
-        self.__board.draw()
-        print(" ", str(current_heuristic['a']) , " ", str(current_heuristic['b']))
+        return

@@ -62,7 +62,5 @@ elif choice == 4:
     mutation_prob = float(raw_input("Insert mutation probability :"))
     max_generation = int(raw_input("Insert maximum number of generation :"))
     max_population = int(raw_input("Insert maximum number of population :"))
-    GeneticAlgorithm(request, mutation_prob, 
+    GeneticAlgorithm(request, mutation_prob,
         max_attempt, max_generation, max_population).start()
-
-

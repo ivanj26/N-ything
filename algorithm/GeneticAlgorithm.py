@@ -22,28 +22,28 @@ class GeneticAlgorithm:
         self.__population = []
 
         self.assign_population(request)
-    
+
     def assign_population(self, request):
         for _ in range(self.__MAX_POPULATION):
-            self.__population.append(Board(request))   
-        
+            self.__population.append(Board(request))
+
         self.sort_population()
-        
+
         self.__best_board = self.__population[0]
-    
+
     def get_fitness(self, board):
         return board.calculate_heuristic()['total']
 
     def sort_population(self):
         self.__population.sort(key=self.get_fitness, reverse=True)
-    
+
     def mutate(self, board):
         piece = board.random_pick()
         new_pos = board.random_move()
-        
+
         piece.set_x(new_pos['x'])
         piece.set_y(new_pos['y'])
-        
+
         return board
 
     def solve_overlap(self, grid):
@@ -53,7 +53,7 @@ class GeneticAlgorithm:
                 if grid.count(val) > 1:
                     new_val = randint(0, 63)
                     grid[grid.index(val)] = new_val
-            
+
             if len(set(grid)) == len(grid):
                 overlap = False
         return grid
@@ -72,34 +72,36 @@ class GeneticAlgorithm:
             grid2.append(parent2.convert_to_grid(
                 pieces2[i].get_x(),
                 pieces2[i].get_y()
-            ))        
-        
+            ))
+
         cross_point = randint(0, len(grid1)-1)
 
         grid_child1 = grid1[0:cross_point+1] + grid2[cross_point+1:len(grid2)]
         grid_child2 = grid2[0:cross_point+1] + grid1[cross_point+1:len(grid1)]
         grid_child1 = self.solve_overlap(grid_child1)
         grid_child2 = self.solve_overlap(grid_child2)
-        
+
         for i in range(len(pieces1)):
             pieces1[i].set_x(Board.convert_to_axis(grid_child1[i])['x'])
             pieces1[i].set_y(Board.convert_to_axis(grid_child1[i])['y'])
 
             pieces2[i].set_x(Board.convert_to_axis(grid_child2[i])['x'])
             pieces2[i].set_y(Board.convert_to_axis(grid_child2[i])['y'])
-                
+
         parent1.set_pieces(pieces1)
         parent2.set_pieces(pieces2)
         return [parent1, parent2]
-        
+
     def stop_searching(self):
         if len(self.__best_board.get_colors()) == 1:
             return self.__best_board.calculate_heuristic()['total'] == 0
         else:
             return self.__best_board.calculate_heuristic()['total'] == 9999 #update soon
-        
+
     def start(self):
         attempt = 1
+        #Start
+        start = round(time(), 3)
         while attempt < self.__MAX_ATTEMPTS:
             generation = 1
             while generation <= self.__MAX_GENERATION:
@@ -124,34 +126,24 @@ class GeneticAlgorithm:
                         # board.draw()
                         board = self.mutate(board)
                         # board.draw()
-                        
+
                 self.sort_population()
                 self.__best_board = self.__population[0] if (
                     self.get_fitness(self.__population[0]) > self.get_fitness(self.__best_board)
                 ) else self.__best_board
 
-                print("Attempt :", attempt)
                 print("Generation :", generation)
                 print("Best Heuristic :", self.__best_board.calculate_heuristic()['total'])
                 self.__best_board.draw()
+                print("  ", self.__best_board.calculate_heuristic()['a'], ' ', self.__best_board.calculate_heuristic()['b'])
 
                 if self.stop_searching():
                     break
-                
+
                 generation = generation + 1
-            
+
             self.assign_population(self.__request)
             attempt = attempt + 1
-            
+
             if self.stop_searching():
                 break
-
-
-                
-
-    
-
-
-            
-
-                
