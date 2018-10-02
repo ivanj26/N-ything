@@ -154,10 +154,12 @@ class SimulatedAnnealing:
 
                     temp = self.cooling_down(temp)
 
-                if (best['total'] < current_heuristic['total']):
-                    best = current_heuristic
-                    best_board = copy(self.__board)
+            #Check if current heuristic is better than current best
+            if (colors > 1 and best['total'] < current_heuristic['total']):
+                best = current_heuristic
+                best_board = copy(self.__board)
 
+            #For count(color) = 1, returns answer if current_heuristic equals to zero
             if (current_heuristic['total'] == 0 and colors == 1):
                 finish = round(time(), 3)
                 os.system('clear')
