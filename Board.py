@@ -30,7 +30,7 @@ class Board:
 			# Get piece type.
 			piece_type = key.split()[1]
 			# Iterate until total request number of each chess piece type has been created.
-			for i in range (value):
+			for _ in range (value):
 				# Append if new color variant exist.
 				if color not in (self.get_colors()):
 					self.get_colors().append(color)
@@ -100,6 +100,7 @@ class Board:
 
 		return self.__MAX_ROWS
 
+	@classmethod
 	def convert_to_grid(self, x, y):
 		"""It converts x,y-axis to grid systems.
 		
@@ -118,6 +119,7 @@ class Board:
 
 		return (y*8 + x)
 
+	@classmethod
 	def convert_to_axis(self, value):
 		"""It converts grid system to x,y-axis.
 		
@@ -356,3 +358,6 @@ class Board:
 
 		for piece in (self.get_pieces()):
 			print (str(piece) + ' (', piece.get_x(), ', ', piece.get_y(), ')')
+	
+	def set_pieces(self, pieces):
+		self.__list_of_pieces = pieces
