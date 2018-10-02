@@ -1,6 +1,7 @@
 from Board import Board
 from pieces import Bishop, Knight, Queen, Rook
-from algorithm import HillClimbing, SimulatedAnnealing
+from algorithm import HillClimbing, SimulatedAnnealing, GeneticAlgorithm
+import os
 
 def file_handler(file_name):
     """Create dictionary of chess pieces.
@@ -31,23 +32,37 @@ def file_handler(file_name):
     return result_dict
 
 ### MAIN ###
-# file_name = raw_input("Enter the file name: ")
-file_name = 'input.txt'
+file_name = raw_input("Enter the file name: ")
 request = file_handler(file_name)
 
-### BOARD ###
-# board = Board(request)
-# print("Heuristic:", board.calculate_heuristic())
-# board.draw()
+print("Choose your desired algorithm..")
+print("1. First Choice Hill Climbing")
+print("2. Stochastic Hill Climbing")
+print("3. Simulated Annealing")
+print("4. Genetic Algorithm")
+choice = int(raw_input("your choice :"))
 
-### HILL CLIMBING ###
-# First Choice Hill Climbing
-# HillClimbing(request, 1, 10)
-# Stochastic Hill Climbing
-# HillClimbing(request, 2, 10)
-
-### SIMULATED ANNEALING ###
-# simulated_annealing = SimulatedAnnealing(board)
-# simulated_annealing.start(request)
+if choice == 1:
+    os.system("clear")
+    max_attempt = int(raw_input("Insert max attempt :"))
+    HillClimbing(request, 1, max_attempt)
+elif choice == 2:
+    os.system("clear")
+    max_attempt = int(raw_input("Insert max attempt :"))
+    HillClimbing(request, 2, max_attempt)
+elif choice == 3:
+    os.system("clear")
+    max_attempt = int(raw_input("Insert max attempt :"))
+    cooling_rate = float(raw_input("Insert cooling rate :"))
+    temp = int(raw_input("Insert temperature :"))
+    SimulatedAnnealing(request, max_attempt, cooling_rate, temp).start()
+elif choice == 4:
+    os.system("clear")
+    max_attempt = int(raw_input("Insert max attempt :"))
+    mutation_prob = float(raw_input("Insert mutation probability :"))
+    max_generation = int(raw_input("Insert maximum number of generation :"))
+    max_population = int(raw_input("Insert maximum number of population :"))
+    GeneticAlgorithm(request, mutation_prob, 
+        max_attempt, max_generation, max_population).start()
 
 
