@@ -121,7 +121,7 @@ class SimulatedAnnealing:
 			print("Attempts\t= " + str(attempts))
 
 			#when temp < 1 -> prob nearly to zero
-			while (temp > 1 and current_heuristic['total'] != 0):
+			while (temp > 1):
 				# For the fastest performance, do not update Board UI
 				# self.print_immediately(attempts, current_heuristic, temp);
 
@@ -155,6 +155,9 @@ class SimulatedAnnealing:
 						piece.set_y(old_position['y'])
 
 					temp = self.cooling_down(temp)
+
+				if (current_heuristic['total'] == 0 and colors == 1):
+					break
 
 			#Check if current heuristic is better than current best
 			if (best['total'] < current_heuristic['total']):
