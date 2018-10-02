@@ -1,5 +1,6 @@
 from __future__ import print_function
 import os, sys
+from copy import copy
 sys.path.append('../')
 sys.path.append('../pieces')
 from time import time
@@ -95,6 +96,8 @@ class HillClimbing:
 		attempts = 1
 		start = round(time(), 3)
 		current_heuristic = None
+		best_heuristic = None
+		best_board = None
 		# Iterate until max attempts are reached.
 		while (attempts <= self.get_max_attempt()):
 			print("Attempts\t= " + str(attempts))
@@ -145,28 +148,41 @@ class HillClimbing:
 				# that gives a better heuristic.
 				if (not better_state):
 					local_maxima = True
+
+			# Check if first iteration
+			if (attempts == 1):
+				best_heuristic = current_heuristic
+				best_board = copy(board)
+			# Check if current heuristic is better than current best
+			elif (best_heuristic['total'] < current_heuristic['total']):
+				best_heuristic = current_heuristic
+				best_board = copy(board)
+
 			# Exits code when goal has achieved, or local maxima achieved with max attempts.
 			if (current_heuristic['total'] == self.get_goal()):
-				finish = round(time(), 3)
-				os.system('clear')
-				print("Yeay, solution found after", attempts, "attempt(s)!")
-				print("Elapsed time = " + str(finish-start) + " seconds\n")
-				board.draw()
-				print("  ", current_heuristic['a'], '', current_heuristic['b'])
-				return
+				break
+
 			# Restart attempt.
 			attempts += 1
 			os.system('clear')
 
-		# Maximum attempts reached.
-		finish = round(time(), 3)
-		os.system('clear')
-		print("Unfortunately, solution not found after", attempts - 1, "attempt(s)!")
-		print("This might because you've exceeded the maximum attempts.")
-		print("Elapsed time = " + str(finish-start) + " seconds\n")
-		board.draw()
-		current_heuristic = board.calculate_heuristic()
-		print("  ", current_heuristic['a'], '', current_heuristic['b'])
+		# Exits code when goal has achieved, or local maxima achieved with max attempts.
+		if (current_heuristic['total'] == self.get_goal()):
+			finish = round(time(), 3)
+			os.system('clear')
+			print("Yeay, solution found after", str(attempts), "attempt(s)!")
+			print("Elapsed time = " + str(finish-start) + " seconds\n")
+		else:
+			# Maximum attempts reached.
+			finish = round(time(), 3)
+			os.system('clear')
+			print("Hill Climbing Algorithm approximates global optimum (with ", attempts - 1, " attempts)")
+			print("Elapsed time = " + str(finish - start) + " seconds\n")
+
+		#Draw best Board
+		best_board.draw()
+		print("  ", str(best_heuristic['a']), '', str(best_heuristic['b']))
+
 		return
 
 	def stochastic(self):
@@ -187,6 +203,8 @@ class HillClimbing:
 		attempts = 1
 		start = round(time(), 3)
 		current_heuristic = None
+		best_heuristic = None
+		best_board = None
 		# Iterate until max attempts are reached.
 		while (attempts <= self.get_max_attempt()):
 			print("Attempts\t= " + str(attempts))
@@ -246,26 +264,39 @@ class HillClimbing:
 				# that gives a better heuristic.
 				if (len(better_states) == 0):
 					local_maxima = True
+
+			# Check if first iteration
+			if (attempts == 1):
+				best_heuristic = current_heuristic
+				best_board = copy(board)
+			# Check if current heuristic is better than current best
+			elif (best_heuristic['total'] < current_heuristic['total']):
+				best_heuristic = current_heuristic
+				best_board = copy(board)
+
 			# Exits code when goal has achieved, or local maxima achieved with max attempts.
 			if (current_heuristic['total'] == self.get_goal()):
-				finish = round(time(), 3)
-				os.system('clear')
-				print("Yeay, solution found after", attempts, "attempt(s)!")
-				print("Elapsed time = " + str(finish-start) + " seconds\n")
-				board.draw()
-				print("  ", current_heuristic['a'], '', current_heuristic['b'])
-				return
+				break
+
 			# Restart attempt.
 			attempts += 1
 			os.system('clear')
 
-		# Maximum attempts reached.
-		finish = round(time(), 3)
-		os.system('clear')
-		print("Unfortunately, solution not found after", attempts - 1, "attempt(s)!")
-		print("This might because you've exceeded the maximum attempts.")
-		print("Elapsed time = " + str(finish-start) + " seconds\n")
-		board.draw()
-		current_heuristic = board.calculate_heuristic()
-		print("  ", current_heuristic['a'], '', current_heuristic['b'])
+		# Exits code when goal has achieved, or local maxima achieved with max attempts.
+		if (current_heuristic['total'] == self.get_goal()):
+			finish = round(time(), 3)
+			os.system('clear')
+			print("Yeay, solution found after", str(attempts), "attempt(s)!")
+			print("Elapsed time = " + str(finish-start) + " seconds\n")
+		else:
+			# Maximum attempts reached.
+			finish = round(time(), 3)
+			os.system('clear')
+			print("Hill Climbing Algorithm approximates global optimum (with ", attempts - 1, " attempts)")
+			print("Elapsed time = " + str(finish - start) + " seconds\n")
+
+		#Draw best Board
+		best_board.draw()
+		print("  ", str(best_heuristic['a']), '', str(best_heuristic['b']))
+
 		return
