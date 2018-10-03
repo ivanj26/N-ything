@@ -102,49 +102,67 @@ class GeneticAlgorithm:
     def get_best_pieces(self, population):
         return deepcopy(population)[0].get_pieces()
 
-    def start(self):
+    def find_solution(self):
+        generation = 1
+        while generation <= self.__MAX_GENERATION:
+            # calculate total pair in a population
+            total_pair = len(self.population) if len(self.population)%2 == 0 else len(self.population)-1
+            new_population = []
 
-        # start the process
-        attempt = 1
-        while attempt <= self.__MAX_ATTEMPTS:
-            
-            # for each attempt do :
-            generation = 1
-            while generation <= self.__MAX_GENERATION:
-                # calculate total pair in a population
-                total_pair = len(self.population) if len(self.population)%2 == 0 else len(self.population)-1
-                new_population = []
+            # generate childs
+            for i in [el for el in list(range(total_pair)) if el % 2 == 0]:
+                new_population = new_population + self.reproduce(self.population[i], self.population[i+1])
 
-                # generate childs
-                for i in [el for el in list(range(total_pair)) if el % 2 == 0]:
-                    new_population = new_population + self.reproduce(self.population[i], self.population[i+1])
+            # assign population with its childs
+            self.population = new_population
+            for board in self.population:
+                if random() < self.__MUTATION_PROB:
+                    board = self.mutate(board)
 
-                # assign population with its childs
-                self.population = new_population
-                for board in self.population:
-                    if random() < self.__MUTATION_PROB:
-                        board = self.mutate(board)
+            self.sort_population()
 
-                self.sort_population()
-                
-                # set best board pieces with the best pieces of the child
-                # otherwise, do nothing
-                if self.best_board.calculate_heuristic()['total'] < self.population[0].calculate_heuristic()['total']:
-                    self.best_board.set_pieces(self.get_best_pieces(self.population))
-                
-                print('Best Heuristic :', self.best_board.calculate_heuristic()['total'])
-
-                if self.stop_searching():
-                    break
-
-                generation = generation + 1
-
-            # reassign population
-            self.assign_population(self.__request)
-            attempt = attempt + 1
-
-            self.best_board.draw()
-            print("  ", self.best_board.calculate_heuristic()['a'], ' ', self.best_board.calculate_heuristic()['b'])
-            
             if self.stop_searching():
                 break
+            generation = generation + 1
+        return deepcopy(self.population[0])
+    
+    def draw_solution(self):
+        self.best_board.draw()
+        print("  ", str(self.best_board.calculate_heuristic()['a']), '', 
+            str(self.best_board.calculate_heuristic()['b']))
+
+    def start(self): 
+        attempt = 1
+        self.best_board = self.find_solution()
+        print('before', self.best_board.calculate_heuristic()['total'])
+
+        start = round(time(), 3)
+        while attempt <= self.__MAX_ATTEMPTS:
+
+            print("Attempts\t= " + str(attempt))
+            if self.stop_searching():
+                break
+            temp_solution = self.find_solution()
+            print('after', self.best_board.calculate_heuristic()['total'])
+
+            if self.best_board.calculate_heuristic()['total'] < temp_solution.calculate_heuristic()['total']:
+                self.best_board = copy(temp_solution)
+
+            print("best heuristic", self.best_board.calculate_heuristic()['total'])
+            attempt = attempt + 1
+            # sleep(0.03)
+            # os.system('clear')
+        finish = round(time(), 3)
+        
+        os.system('clear')
+        print("GA Algorithm approximates global optimum (with ", attempt, " attempt(s))")
+        print("Elapsed time = " + str(finish-start) + " seconds\n")
+        self.draw_solution()
+
+
+
+
+        
+
+
+        
