@@ -20,23 +20,23 @@ class GeneticAlgorithm:
         self.__MAX_GENERATION = max_generation
         self.__MAX_POPULATION = max_population
         self.__SUM_COLORS = len(Board(request).get_colors())
-        self.__population = []
+        self.population = []
 
         self.assign_population(request)
 
     def assign_population(self, request):
         for _ in range(self.__MAX_POPULATION):
-            self.__population.append(Board(request))
+            self.population.append(Board(request))
 
         self.sort_population()
-
-        self.__best_board = deepcopy(self.__population[0])
+        self.best_board = Board(request)
+        self.best_board.set_pieces(self.get_best_pieces(self.population))
 
     def get_fitness(self, board):
         return board.calculate_heuristic()['total']
 
     def sort_population(self):
-        self.__population.sort(key=self.get_fitness, reverse=True)
+        self.population.sort(key=self.get_fitness, reverse=True)
 
     def mutate(self, board):
         piece = board.random_pick()
@@ -94,46 +94,57 @@ class GeneticAlgorithm:
         return [parent1, parent2]
 
     def stop_searching(self):
-        if len(self.__best_board.get_colors()) == 1:
-            return self.__best_board.calculate_heuristic()['total'] == 0
+        if len(self.best_board.get_colors()) == 1:
+            return self.best_board.calculate_heuristic()['total'] == 0
         else:
-            return self.__best_board.calculate_heuristic()['total'] == 9999 #update soon
+            return self.best_board.calculate_heuristic()['total'] == 9999 #update soon
+
+    def get_best_pieces(self, population):
+        return deepcopy(population)[0].get_pieces()
 
     def start(self):
+
+        # start the process
         attempt = 1
-        #Start
-        start = round(time(), 3)
         while attempt <= self.__MAX_ATTEMPTS:
+            
+            # for each attempt do :
             generation = 1
             while generation <= self.__MAX_GENERATION:
-                total_pair = len(self.__population) if len(self.__population)%2 == 0 else len(self.__population)-1
+                # calculate total pair in a population
+                total_pair = len(self.population) if len(self.population)%2 == 0 else len(self.population)-1
                 new_population = []
 
+                # generate childs
                 for i in [el for el in list(range(total_pair)) if el % 2 == 0]:
-                    new_population = new_population + self.reproduce(self.__population[i], self.__population[i+1])
+                    new_population = new_population + self.reproduce(self.population[i], self.population[i+1])
 
-                self.__population = new_population
-                for board in self.__population:
+                # assign population with its childs
+                self.population = new_population
+                for board in self.population:
                     if random() < self.__MUTATION_PROB:
                         board = self.mutate(board)
 
                 self.sort_population()
-
-                if self.__best_board.calculate_heuristic()['total'] < self.__population[0].calculate_heuristic()['total']:
-                    self.__best_board = deepcopy(self.__population[0])
                 
-                print('Best Heuristic :', self.__best_board.calculate_heuristic()['total'])
+                # set best board pieces with the best pieces of the child
+                # otherwise, do nothing
+                if self.best_board.calculate_heuristic()['total'] < self.population[0].calculate_heuristic()['total']:
+                    self.best_board.set_pieces(self.get_best_pieces(self.population))
+                
+                print('Best Heuristic :', self.best_board.calculate_heuristic()['total'])
 
                 if self.stop_searching():
                     break
 
                 generation = generation + 1
 
+            # reassign population
             self.assign_population(self.__request)
             attempt = attempt + 1
 
-            self.__best_board.draw()
-            print("  ", self.__best_board.calculate_heuristic()['a'], ' ', self.__best_board.calculate_heuristic()['b'])
+            self.best_board.draw()
+            print("  ", self.best_board.calculate_heuristic()['a'], ' ', self.best_board.calculate_heuristic()['b'])
             
             if self.stop_searching():
                 break
