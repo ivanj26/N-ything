@@ -1,7 +1,7 @@
 from __future__ import print_function
 from time import sleep
 from time import time
-from copy import copy
+from copy import copy, deepcopy
 import os
 import sys
 import math
@@ -30,7 +30,7 @@ class GeneticAlgorithm:
 
         self.sort_population()
 
-        self.__best_board = copy(self.__population[0])
+        self.__best_board = deepcopy(self.__population[0])
 
     def get_fitness(self, board):
         return board.calculate_heuristic()['total']
@@ -109,34 +109,20 @@ class GeneticAlgorithm:
                 total_pair = len(self.__population) if len(self.__population)%2 == 0 else len(self.__population)-1
                 new_population = []
 
-                # print("Before")
-                # for board in self.__population:
-                #     print("len board :", len(board.get_pieces()))
-
                 for i in [el for el in list(range(total_pair)) if el % 2 == 0]:
                     new_population = new_population + self.reproduce(self.__population[i], self.__population[i+1])
-
-                # print("After")
-                # for board in self.__population:
-                #     print("len board :", len(board.get_pieces()))
-
 
                 self.__population = new_population
                 for board in self.__population:
                     if random() < self.__MUTATION_PROB:
-                        # board.draw()
                         board = self.mutate(board)
-                        # board.draw()
 
                 self.sort_population()
-                self.__best_board = copy(self.__population[0]) if (
-                    self.get_fitness(self.__population[0]) > self.get_fitness(self.__best_board)
-                ) else self.__best_board
 
-                print("Generation :", generation)
-                print("Best Heuristic :", self.__best_board.calculate_heuristic()['total'])
-                #self.__best_board.draw()
-                #print("  ", self.__best_board.calculate_heuristic()['a'], ' ', self.__best_board.calculate_heuristic()['b'])
+                if self.__best_board.calculate_heuristic()['total'] < self.__population[0].calculate_heuristic()['total']:
+                    self.__best_board = deepcopy(self.__population[0])
+                
+                print('Best Heuristic :', self.__best_board.calculate_heuristic()['total'])
 
                 if self.stop_searching():
                     break

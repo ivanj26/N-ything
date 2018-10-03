@@ -1,17 +1,25 @@
-file_name = "input.txt"
-def file_handler(file_name):
-    with open(file_name) as fin:
-        file = []
-        for line in fin.readlines():
-            file.append(line.replace('\n', ''))
-    
-    file_encoded = [x.split() for x in file]
-    
-    result_dict = {}
-    for line in file_encoded:
-        result_dict[line[0] + ' ' + line[1]] = int(line[2])
-    
-    return result_dict
+from copy import deepcopy
 
+class A:
+    
+    def __init__(self, a1, a2):
+        self.__atr1 = a1
+        self.__atr2 = a2
 
-file_handler(file_name)
+    def setA1(self, a1):
+        self.__atr1 = a1
+    
+
+    def setA2(self, a2):
+        self.__atr2 = a2
+    
+    def getA2(self):
+        return self.__atr2
+
+    def getA1(self):
+        return self.__atr1
+
+obj1 = A(1, 2)
+obj2 = deepcopy(obj1)
+obj1.setA1(2)
+print(obj2.getA1(), obj1.getA1())
