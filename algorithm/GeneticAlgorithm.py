@@ -162,7 +162,7 @@ class GeneticAlgorithm:
         finish = round(time(), 3)
         
         os.system('clear')
-        print("GA Algorithm approximates global optimum (with ", attempt, " attempt(s))")
+        print("GA Algorithm approximates global optimum (with ", attempt-1, " attempt(s))")
         print("Elapsed time = " + str(finish-start) + " seconds\n")
         self.draw_solution(best_board)
 
