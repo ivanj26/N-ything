@@ -30,7 +30,7 @@ class GeneticAlgorithm:
 
         self.sort_population()
 
-        self.__best_board = copy(self.__population[0])
+        self.__best_board = self.__population[0]
 
     def get_fitness(self, board):
         return board.calculate_heuristic()['total']
@@ -101,6 +101,15 @@ class GeneticAlgorithm:
 
     def start(self):
         attempt = 1
+
+        best = None
+        best_board = None
+
+        if (self.__SUM_COLORS > 1):
+        	best = {'a' : 0, 'b' : -999 ,'total': -999}
+        else:
+        	best = {'a' : 999, 'b' : 0, 'total': -999}
+
         #Start
         start = round(time(), 3)
         while attempt <= self.__MAX_ATTEMPTS:
@@ -129,7 +138,7 @@ class GeneticAlgorithm:
                         # board.draw()
 
                 self.sort_population()
-                self.__best_board = copy(self.__population[0]) if (
+                self.__best_board = self.__population[0] if (
                     self.get_fitness(self.__population[0]) > self.get_fitness(self.__best_board)
                 ) else self.__best_board
 
@@ -146,8 +155,16 @@ class GeneticAlgorithm:
             self.assign_population(self.__request)
             attempt = attempt + 1
 
-            self.__best_board.draw()
-            print("  ", self.__best_board.calculate_heuristic()['a'], ' ', self.__best_board.calculate_heuristic()['b'])
-            
+            best_board = self.__population[0]
+
+            if (best['total'] > self.get_fitness(best_board)):
+            	best = self.__best_board.calculate_heuristic()
+            	best_board = copy(self.__best_board)
+            else:
+            	best_board = copy(best_board)
+
+            best_board.draw()
+            print("  ", best['a'], ' ', best['b'])
+
             if self.stop_searching():
                 break
