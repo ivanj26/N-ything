@@ -20,23 +20,22 @@ class GeneticAlgorithm:
         self.__MAX_GENERATION = max_generation
         self.__MAX_POPULATION = max_population
         self.__SUM_COLORS = len(Board(request).get_colors())
-        self.population = []
 
         self.assign_population(request)
 
     def assign_population(self, request):
+        self.population = []
         for _ in range(self.__MAX_POPULATION):
             self.population.append(Board(request))
 
-        self.sort_population()
-        self.best_board = Board(request)
-        self.best_board.set_pieces(self.get_best_pieces(self.population))
+        self.population = self.sort_population(self.population)
 
     def get_fitness(self, board):
         return board.calculate_heuristic()['total']
 
-    def sort_population(self):
-        self.population.sort(key=self.get_fitness, reverse=True)
+    def sort_population(self, population):
+        population.sort(key=self.get_fitness, reverse=True)
+        return population
 
     def mutate(self, board):
         piece = board.random_pick()
@@ -93,71 +92,79 @@ class GeneticAlgorithm:
         parent2.set_pieces(pieces2)
         return [parent1, parent2]
 
-    def stop_searching(self):
-        if len(self.best_board.get_colors()) == 1:
-            return self.best_board.calculate_heuristic()['total'] == 0
+    def stop_searching(self, board):
+        if len(board.get_colors()) == 1:
+            return board.calculate_heuristic()['total'] == 0
         else:
-            return self.best_board.calculate_heuristic()['total'] == 9999 #update soon
+            return board.calculate_heuristic()['total'] == 9999 #update soon
 
     def get_best_pieces(self, population):
         return deepcopy(population)[0].get_pieces()
 
-    def find_solution(self):
+    def find_solution(self, population):
         generation = 1
         while generation <= self.__MAX_GENERATION:
             # calculate total pair in a population
-            total_pair = len(self.population) if len(self.population)%2 == 0 else len(self.population)-1
+            total_pair = len(population) if len(population)%2 == 0 else len(population)-1
             new_population = []
 
             # generate childs
             for i in [el for el in list(range(total_pair)) if el % 2 == 0]:
-                new_population = new_population + self.reproduce(self.population[i], self.population[i+1])
+                new_population = new_population + self.reproduce(population[i], population[i+1])
 
             # assign population with its childs
-            self.population = new_population
-            for board in self.population:
+            population = new_population
+            for board in population:
                 if random() < self.__MUTATION_PROB:
                     board = self.mutate(board)
 
-            self.sort_population()
+            population = self.sort_population(population)
 
-            if self.stop_searching():
+            if self.stop_searching(population[0]):
                 break
             generation = generation + 1
-        return deepcopy(self.population[0])
+        return population[0]
     
-    def draw_solution(self):
-        self.best_board.draw()
-        print("  ", str(self.best_board.calculate_heuristic()['a']), '', 
-            str(self.best_board.calculate_heuristic()['b']))
+    def draw_solution(self, board):
+        board.draw()
+        print("  ", str(board.calculate_heuristic()['a']), '', 
+            str(board.calculate_heuristic()['b']))
 
     def start(self): 
         attempt = 1
-        self.best_board = self.find_solution()
-        print('before', self.best_board.calculate_heuristic()['total'])
+
+        best = None
+        best_board = None
+
+        if (self.__SUM_COLORS > 1):
+			best = {'a' : 0, 'b' : -999 ,'total': -999}
+        else:
+			best = {'a' : 999, 'b' : 0, 'total': -999}
 
         start = round(time(), 3)
         while attempt <= self.__MAX_ATTEMPTS:
 
             print("Attempts\t= " + str(attempt))
-            if self.stop_searching():
+            
+            temp_solution = self.find_solution(self.population)
+
+            if best['total'] < temp_solution.calculate_heuristic()['total']:
+                best = copy(temp_solution.calculate_heuristic())
+                best_board = copy(temp_solution)
+
+            if self.stop_searching(best_board):
                 break
-            temp_solution = self.find_solution()
-            print('after', self.best_board.calculate_heuristic()['total'])
 
-            if self.best_board.calculate_heuristic()['total'] < temp_solution.calculate_heuristic()['total']:
-                self.best_board = copy(temp_solution)
-
-            print("best heuristic", self.best_board.calculate_heuristic()['total'])
             attempt = attempt + 1
-            # sleep(0.03)
-            # os.system('clear')
+            self.assign_population(self.__request)
+            sleep(0.03)
+            os.system('clear')
         finish = round(time(), 3)
         
         os.system('clear')
         print("GA Algorithm approximates global optimum (with ", attempt, " attempt(s))")
         print("Elapsed time = " + str(finish-start) + " seconds\n")
-        self.draw_solution()
+        self.draw_solution(best_board)
 
 
 
