@@ -36,7 +36,7 @@ search berikut:
    ```shell
     python main.py
    ```
-2. Insert the input filename.
+2. Input the filename, you can choose one of test file from this repository.
 2. Choose the algorithm strategy to find the solution.
 3. Choose max attempt.
 4. The Board will printing immediately after found the solution.
