@@ -1,5 +1,11 @@
 # N-ything
 
+`English version`
+
+The eight queens puzzle is the problem of placing eight chess queens on an 8×8 chessboard so that no two queens threaten each other; thus, a solution requires that no two queens share the same row, column, or diagonal. The eight queens puzzle is an example of the more general n queens problem of placing n non-attacking queens on an n×n chessboard, for which solutions exist for all natural numbers n with the exception of n = 2 and n = 3
+
+`Indonesia version`
+
 N-ything problem merupakan modifikasi N-queen problem. Perbedaannya, buah catur yang
 menjadi pertimbangan bukan hanya ratu (queen), namun juga meliputi kuda (knight), gajah
 (bishop), dan benteng (rook). Seperti N-queen problem, permasalahan dari N-ything problem
@@ -22,12 +28,23 @@ search berikut:
 2. Simulated annealing
 3. Genetic algorithm
 
-## Aturan Tambahan
-1. Bahasa yang boleh dipergunakan adalah Python.
-2. 1 kelompok terdiri dari 4-5 orang anggota.
-3. Anggota kelompok boleh lintas kelas namun anggota kelompok tidak boleh sama
-dengan tugas kecil yang lalu.
-4. Isi nama kelompok dan setiap anggotanya di sheet berikut:
-https://docs.google.com/spreadsheets/d/1lLYFk60fmx7xAWBvn35HO7oTpkqjEdwnevXU
-xvt_1Pc/
-5. Pengisian nama kelompok sampai Senin, 17 September 2018​.
+## Requirements
+- Python2
+
+## How to run app?
+1. Run the program with the following command.
+   ```shell
+    python main.py
+   ```
+2. Insert the input filename.
+2. Choose the algorithm strategy to find the solution.
+3. Choose max attempt.
+4. The Board will printing immediately after found the solution.
+
+# Screenshots
+![App .gif #1](./screenshots/1080p%20Screen%20Recording%202021-09-10%20at%2019.30.15.gif)
+**Figure 1** - App preview
+
+
+![App Screenshot #2](./screenshots/Screen%20Shot%202021-09-10%20at%2019.38.58.png)
+**Figure 2** - App screenshot

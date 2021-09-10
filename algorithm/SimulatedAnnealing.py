@@ -123,7 +123,7 @@ class SimulatedAnnealing:
 			#when temp < 1 -> prob nearly to zero
 			while (temp > 1):
 				# For the fastest performance, do not update Board UI
-				# self.print_immediately(attempts, current_heuristic, temp);
+				self.print_immediately(attempts, current_heuristic, temp)
 
 				#Call random_pick from board
 				piece = self.__board.random_pick()
